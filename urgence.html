@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urgence</title>
+    <style>
+        /* Styles globaux */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f9fafc;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+        body.dark {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        .container.dark {
+            background-color: #34495e;
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        input, select, button, textarea {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #d1d1d1;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #70e0b6;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color:#70e0b6;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #70e0b6;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+        .toggle {
+            margin-top: 10px;
+            cursor: pointer;
+            color: #70e0b6;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        .saved {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body onload="loadEmergencyInfo()">
+    <div class="container" id="app">
+        <h1>Urgence</h1>
+        <p>Renseignez vos informations d'urgence pour une prise en charge rapide.</p>
+        <label for="bloodGroup">Groupe Sanguin :</label>
+        <select id="bloodGroup">
+            <option value="">Sélectionnez</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+        </select>
+
+        <label for="allergens">Allergènes :</label>
+        <textarea id="allergens" rows="3" placeholder="Listez vos allergies"></textarea>
+        <label for="medicalHistory">Antécédents Médicaux :</label>
+        <textarea id="medicalHistory" rows="3" placeholder="Précisez vos antécédents médicaux"></textarea>
+        <button onclick="saveEmergencyInfo()">Sauvegarder</button>
+        <button onclick="resetFields()">Réinitialiser</button>
+        <div class="result" id="result"></div>
+        <span class="toggle" onclick="toggleDarkMode()">Activer/Désactiver Mode sombre</span>
+    </div>
+
+    <script>
+        // Fonction pour sauvegarder les informations
+        function saveEmergencyInfo() {
+            const bloodGroup = document.getElementById("bloodGroup").value;
+            const allergens = document.getElementById("allergens").value.trim();
+            const medicalHistory = document.getElementById("medicalHistory").value.trim();
+            if (bloodGroup && (allergens || medicalHistory)) {
+                // Sauvegarde des données dans localStorage
+                localStorage.setItem("bloodGroup", bloodGroup);
+                localStorage.setItem("allergens", allergens);
+                localStorage.setItem("medicalHistory", medicalHistory);
+                // Confirmation visuelle
+                document.getElementById("result").innerHTML = 
+                    `<span class="saved">Informations d'urgence sauvegardées avec succès !</span>
+- Groupe Sanguin : ${bloodGroup}
+- Allergènes : ${allergens || "Non spécifié"}
+- Antécédents Médicaux : ${medicalHistory || "Non spécifié"}`;
+            } else {
+                document.getElementById("result").innerText = 
+                    "Veuillez remplir le groupe sanguin et au moins un autre champ.";
+            }
+        }
+        // Fonction pour charger les informations sauvegardées
+        function loadEmergencyInfo() {
+            const bloodGroup = localStorage.getItem("bloodGroup") || "";
+            const allergens = localStorage.getItem("allergens") || "";
+            const medicalHistory = localStorage.getItem("medicalHistory") || "";
+            document.getElementById("bloodGroup").value = bloodGroup;
+            document.getElementById("allergens").value = allergens;
+            document.getElementById("medicalHistory").value = medicalHistory;
+            if (bloodGroup || allergens || medicalHistory) {
+                document.getElementById("result").innerHTML = 
+                    `<span class="saved">Informations rechargées depuis la dernière sauvegarde :</span>
+- Groupe Sanguin : ${bloodGroup}
+- Allergènes : ${allergens || "Non spécifié"}
+- Antécédents Médicaux : ${medicalHistory || "Non spécifié"}`;
+            }
+        }
+
+        // Fonction pour réinitialiser les champs
+        function resetFields() {
+            document.getElementById("bloodGroup").value = "";
+            document.getElementById("allergens").value = "";
+            document.getElementById("medicalHistory").value = "";
+            document.getElementById("result").innerText = "";
+        }
+        // Fonction pour basculer en mode sombre
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark");
+            document.getElementById("app").classList.toggle("dark");
+        }
+    </script>
+</body>
+</html>

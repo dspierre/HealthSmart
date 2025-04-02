@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suggestions Culinaires et Notation</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f9fafc;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    select, button {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #70e0b6;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #56c29c;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      text-align: left;
+      font-size: 16px;
+      margin: 10px 0;
+      border-bottom: 1px solid #ececec;
+      padding-bottom: 10px;
+    }
+    #recipe-details {
+      display: none;
+      margin-top: 20px;
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    #pagination-controls button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Suggestions Culinaires et Notation</h1>
+  <form id="allergy-form">
+    <label for="allergies">Types d'allergies ou intolérances :</label>
+    <select id="allergies" multiple>
+      <option value="pollens">🌾 Pollens</option>
+      <option value="gluten">🍞 Gluten</option>
+      <option value="lactose">🥛 Lactose</option>
+      <option value="arachides">🥜 Arachides</option>
+      <option value="fruits_de_mer">🦐 Fruits de mer</option>
+      <option value="arachide">🥜 Arachide</option>
+      <option value="celeri">🥕 Céleri</option>
+      <option value="crustaces">🦀 Crustacés</option>
+      <option value="cereales_gluten">🌾 Céréales contenant du Gluten</option>
+      <option value="fruits_a_coque">🌰 Fruits à coque</option>
+      <option value="lait">🥛 Lait</option>
+      <option value="lupin">🌿 Lupin</option>
+      <option value="oeuf">🍳 Œuf</option>
+      <option value="mollusques">🐚 Mollusques</option>
+      <option value="moutarde">🌿 Moutarde</option>
+      <option value="sesame">🥒 Sésame</option>
+      <option value="soja">🥦 Soja</option>
+      <option value="sulfites">🍇 Sulfites</option>
+    </select>
+    <button type="button" id="search-button">Rechercher</button>
+  </form>
+  <div id="recipe-results">
+    <ul id="recipe-list"></ul> <!-- Liste des recettes -->
+  </div>
+  <div id="recipe-details">
+    <h3 id="recipe-title"></h3>
+    <p id="recipe-ingredients"></p>
+    <p id="recipe-instructions"></p>
+    <button id="close-details">Fermer</button>
+  </div>
+  <div id="pagination-controls"></div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchButton = document.getElementById("search-button");
+    const recipeList = document.getElementById("recipe-list");
+    const recipeDetails = document.getElementById("recipe-details");
+    const paginationControls = document.getElementById("pagination-controls");
+    const allergyRecipes = {
+      gluten: [
+        {
+          name: "Gâteau au chocolat sans gluten",
+          ingredients: ["Farine de riz", "Cacao en poudre", "Sucre", "Œufs", "Beurre sans lactose"],
+          instructions: "Mélangez tous les ingrédients. Versez dans un moule. Faites cuire au four."
+        },
+        {
+          name: "Crêpes sans gluten",
+          ingredients: ["Farine de riz", "Lait sans lactose", "Œufs", "Sucre", "Huile"],
+          instructions: "Mélangez les ingrédients. Faites cuire la pâte dans une poêle chaude."
+        },
+        {
+          name: "Pain à la banane sans gluten",
+          ingredients: ["Farine de riz", "Bananes mûres", "Sucre", "Œufs", "Levure chimique"],
+          instructions: "Écrasez les bananes, ajoutez les autres ingrédients. Faites cuire au four."
+        },
+        {
+          name: "Muffins aux myrtilles sans gluten",
+          ingredients: ["Farine de riz", "Myrtilles", "Sucre", "Œufs", "Levure chimique"],
+          instructions: "Mélangez les ingrédients. Répartissez dans des moules à muffins. Faites cuire au four."
+        },
+        {
+          name: "Galettes de pommes de terre sans gluten",
+          ingredients: ["Pommes de terre râpées", "Farine de riz", "Œufs", "Sel", "Huile"],
+          instructions: "Mélangez les ingrédients. Faites cuire dans une poêle chaude."
+        }
+      ],
+      lactose: [
+        {
+          name: "Porridge au lait de coco",
+          ingredients: ["Flocons d'avoine sans gluten", "Lait de coco", "Fruits frais", "Miel"],
+          instructions: "Faites chauffer les flocons d'avoine avec le lait de coco. Ajoutez les fruits et le miel avant de servir."
+        },
+        {
+          name: "Curry de légumes au lait de coco",
+          ingredients: ["Légumes variés", "Lait de coco", "Épices pour curry"],
+          instructions: "Faites cuire les légumes avec les épices. Ajoutez le lait de coco et laissez mijoter."
+        },
+        {
+          name: "Crème dessert au lait d'amande",
+          ingredients: ["Lait d'amande", "Fécule de maïs", "Sucre", "Extrait de vanille"],
+          instructions: "Mélangez tous les ingrédients et faites chauffer jusqu'à épaississement. Laissez refroidir avant de servir."
+        },
+        {
+          name: "Pesto vegan aux noix de cajou",
+          ingredients: ["Basilic frais", "Noix de cajou", "Huile d'olive", "Ail"],
+          instructions: "Mixez tous les ingrédients pour obtenir une consistance lisse. Utilisez sur des pâtes ou comme tartinade."
+        },
+        {
+          name: "Soupe froide au concombre et yaourt végétal",
+          ingredients: ["Concombre", "Yaourt végétal", "Herbes fraîches", "Ail"],
+          instructions: "Mixez tous les ingrédients. Servez bien frais."
+        }
+      ],
+      arachides: [
+        {
+          name: "Nouilles de riz sautées",
+          ingredients: ["Nouilles de riz", "Légumes variés", "Sauce soja sans gluten"],
+          instructions: "Faites sauter les nouilles avec les légumes et la sauce dans un wok."
+        },
+        {
+          name: "Barres énergétiques maison",
+          ingredients: ["Flocons d'avoine", "Dattes", "Noix de coco râpée", "Graines de chia"],
+          instructions: "Mixez les ingrédients, façonnez en barres, et laissez refroidir."
+        },
+        {
+          name: "Pain sans noix",
+          ingredients: ["Farine complète", "Eau", "Levure", "Sel"],
+          instructions: "Pétrissez la pâte et laissez reposer avant de cuire au four."
+        },
+        {
+          name: "Cake aux fruits sans arachides",
+          ingredients: ["Farine", "Œufs", "Fruits secs (sans arachides)", "Sucre"],
+          instructions: "Mélangez tous les ingrédients et cuisez au four."
+        },
+        {
+          name: "Velouté de légumes",
+          ingredients: ["Carottes", "Pommes de terre", "Crème végétale", "Herbes"],
+          instructions: "Faites cuire les légumes, puis mixez-les avec la crème."
+        }
+      ],
+      arachides: [
+        {
+          name: "Barres de céréales maison",
+          ingredients: ["Flocons d'avoine", "Dattes", "Noix de coco râpée", "Graines de chia"],
+          instructions: "Mixez les ingrédients, façonnez en barres, laissez refroidir."
+        },
+        {
+          name: "Smoothie aux fruits tropicaux",
+          ingredients: ["Mangue", "Banane", "Lait de coco"],
+          instructions: "Mélangez les fruits avec le lait de coco dans un mixeur. Servez frais."
+        },
+        {
+          name: "Biscuits sans arachides",
+          ingredients: ["Farine", "Sucre", "Œufs", "Beurre végétal"],
+          instructions: "Mélangez les ingrédients, façonnez en biscuits, et cuisez au four."
+        },
+        {
+          name: "Pain maison sans arachides",
+          ingredients: ["Farine complète", "Eau", "Levure", "Sel"],
+          instructions: "Pétrissez la pâte, laissez reposer, et cuisez au four."
+        },
+        {
+          name: "Granola maison",
+          ingredients: ["Flocons d'avoine", "Graines variées", "Miel"],
+          instructions: "Mélangez les ingrédients et faites cuire doucement au four."
+        }
+      ],
+      fruits_de_mer: [
+        {
+          name: "Risotto aux légumes",
+          ingredients: ["Riz arborio", "Bouillon de légumes", "Légumes variés"],
+          instructions: "Faites cuire le riz avec le bouillon, ajoutez les légumes."
+        },
+        {
+          name: "Pizza végétarienne",
+          ingredients: ["Pâte à pizza", "Tomates", "Mozzarella sans lactose"],
+          instructions: "Ajoutez la garniture sur la pâte à pizza et faites cuire au four."
+        },
+        {
+          name: "Tacos aux légumes",
+          ingredients: ["Tortillas", "Légumes variés", "Sauce épicée"],
+          instructions: "Garnissez les tortillas avec les légumes et la sauce."
+        },
+        {
+          name: "Soupe de légumes au curry",
+          ingredients: ["Carottes", "Patates douces", "Lait de coco", "Curry"],
+          instructions: "Mixez les légumes avec le lait de coco et ajoutez les épices."
+        },
+        {
+          name: "Salade composée",
+          ingredients: ["Salade verte", "Tomates", "Olives", "Vinaigrette maison"],
+          instructions: "Mélangez les ingrédients pour une salade fraîche."
+        }
+      ],
+      arachide: [
+        {
+          name: "Muffins aux fruits rouges",
+          ingredients: ["Farine", "Sucre", "Œufs", "Fruits rouges"],
+          instructions: "Mélangez les ingrédients et faites cuire au four."
+        },
+        {
+          name: "Porridge maison",
+          ingredients: ["Flocons d'avoine", "Lait végétal", "Fruits secs"],
+          instructions: "Faites chauffer les flocons d'avoine avec le lait et ajoutez les fruits."
+        },
+        {
+          name: "Crêpes sans arachide",
+          ingredients: ["Farine", "Lait végétal", "Œufs", "Sucre"],
+          instructions: "Mélangez les ingrédients et faites cuire dans une poêle chaude."
+        },
+        {
+          name: "Galettes de légumes",
+          ingredients: ["Courgettes râpées", "Farine", "Œufs", "Sel"],
+          instructions: "Formez les galettes et faites cuire à la poêle."
+        },
+        {
+          name: "Curry végétarien",
+          ingredients: ["Légumes variés", "Lait de coco", "Épices pour curry"],
+          instructions: "Faites cuire les légumes avec les épices et le lait de coco."
+        }
+      ],
+      celeri: [
+        {
+          name: "Gratin de courgettes",
+          ingredients: ["Courgettes", "Crème végétale", "Fromage vegan"],
+          instructions: "Disposez les courgettes en couches, ajoutez la crème et le fromage. Faites cuire au four."
+        },
+        {
+          name: "Tarte aux tomates et basilic",
+          ingredients: ["Pâte feuilletée", "Tomates", "Basilic frais"],
+          instructions: "Disposez les tomates sur la pâte, ajoutez le basilic, et faites cuire au four."
+        },
+        {
+          name: "Soupe de légumes maison",
+          ingredients: ["Pommes de terre", "Carottes", "Herbes fraîches"],
+          instructions: "Faites cuire les légumes, mixez-les, et ajoutez les herbes."
+        },
+        {
+          name: "Salade quinoa et légumes",
+          ingredients: ["Quinoa", "Concombre", "Tomates", "Vinaigrette maison"],
+          instructions: "Mélangez le quinoa avec les légumes et ajoutez la vinaigrette."
+        },
+        {
+          name: "Gâteau au chocolat",
+          ingredients: ["Farine de riz", "Cacao", "Sucre", "Œufs"],
+          instructions: "Mélangez les ingrédients, versez dans un moule, et cuisez au four."
+        }
+      ],
+      crustaces: [
+        {
+          name: "Légumes grillés au four",
+          ingredients: ["Courgettes", "Poivrons", "Aubergines", "Herbes"],
+          instructions: "Disposez les légumes sur une plaque, ajoutez les herbes, et faites griller au four."
+        },
+        {
+          name: "Risotto végétarien",
+          ingredients: ["Riz arborio", "Bouillon de légumes", "Légumes variés"],
+          instructions: "Faites cuire le riz avec le bouillon, ajoutez les légumes."
+        },
+        {
+          name: "Curry de légumes",
+          ingredients: ["Lait de coco", "Légumes variés", "Épices pour curry"],
+          instructions: "Faites mijoter les légumes dans le lait de coco avec les épices."
+        },
+        {
+          name: "Tacos vegan",
+          ingredients: ["Tortillas", "Haricots rouges", "Légumes frais"],
+          instructions: "Garnissez les tortillas avec les haricots et les légumes."
+        },
+        {
+          name: "Salade composée sans crustacés",
+          ingredients: ["Salade verte", "Concombre", "Olives", "Vinaigrette maison"],
+          instructions: "Mélangez les ingrédients dans un grand bol."
+        }
+      ],
+      cereales_gluten: [
+        {
+          name: "Pain classique aux céréales",
+          ingredients: ["Farine de blé", "Eau", "Levure", "Sel"],
+          instructions: "Pétrissez la pâte, laissez lever, et faites cuire au four."
+        },
+        {
+          name: "Spaghetti à la bolognaise",
+          ingredients: ["Spaghetti de blé", "Tomates", "Viande hachée", "Herbes"],
+          instructions: "Faites cuire les pâtes, préparez la sauce, et mélangez."
+        },
+        {
+          name: "Pizza maison",
+          ingredients: ["Farine de blé", "Sauce tomate", "Mozzarella", "Garnitures variées"],
+          instructions: "Préparez la pâte, ajoutez les ingrédients, et cuisez au four."
+        },
+        {
+          name: "Tarte aux pommes",
+          ingredients: ["Farine de blé", "Pommes", "Sucre", "Beurre"],
+          instructions: "Préparez la pâte, disposez les pommes, et cuisez au four."
+        },
+        {
+          name: "Croissants maison",
+          ingredients: ["Farine de blé", "Beurre", "Levure", "Lait"],
+          instructions: "Préparez la pâte, façonnez les croissants, et cuisez au four."
+        }
+      ],
+      fruits_a_coque: [
+        {
+          name: "Brownies aux noix",
+          ingredients: ["Farine", "Sucre", "Œufs", "Noix", "Chocolat"],
+          instructions: "Mélangez les ingrédients, versez dans un moule, et cuisez au four."
+        },
+        {
+          name: "Salade de fruits secs",
+          ingredients: ["Amandes", "Noix de cajou", "Raisins secs", "Pistaches"],
+          instructions: "Mélangez tous les ingrédients dans un bol."
+        },
+        {
+          name: "Pesto maison",
+          ingredients: ["Basilic frais", "Pignons de pin", "Huile d'olive", "Parmesan"],
+          instructions: "Mixez tous les ingrédients pour obtenir une consistance lisse."
+        },
+        {
+          name: "Cake aux noisettes",
+          ingredients: ["Farine", "Sucre", "Œufs", "Noisettes", "Lait"],
+          instructions: "Mélangez les ingrédients, versez dans un moule, et cuisez au four."
+        },
+        {
+          name: "Granola maison aux amandes",
+          ingredients: ["Flocons d'avoine", "Amandes", "Miel", "Graines de chia"],
+          instructions: "Mélangez les ingrédients, et faites cuire doucement au four."
+        }
+      ],
+      lait: [
+        {
+          name: "Crème caramel",
+          ingredients: ["Lait", "Sucre", "Œufs", "Vanille"],
+          instructions: "Préparez le caramel, ajoutez la crème, et cuisez au bain-marie."
+        },
+        {
+          name: "Mac & Cheese",
+          ingredients: ["Pâtes", "Lait", "Fromage râpé", "Beurre"],
+          instructions: "Faites cuire les pâtes, ajoutez la sauce au fromage, et servez."
+        },
+        {
+          name: "Milkshake au chocolat",
+          ingredients: ["Lait", "Glace au chocolat", "Chocolat fondu"],
+          instructions: "Mixez tous les ingrédients dans un blender."
+        },
+        {
+          name: "Flan pâtissier",
+          ingredients: ["Lait", "Farine", "Sucre", "Œufs", "Vanille"],
+          instructions: "Préparez la pâte, versez l'appareil, et cuisez au four."
+        },
+        {
+          name: "Panna Cotta",
+          ingredients: ["Lait", "Crème", "Sucre", "Gélatine"],
+          instructions: "Faites chauffer la crème avec le sucre, ajoutez la gélatine, et laissez refroidir."
+        }
+      ],
+      lupin: [
+        {
+          name: "Galettes au lupin",
+          ingredients: ["Farine de lupin", "Eau", "Sel", "Herbes"],
+          instructions: "Mélangez les ingrédients, façonnez en galettes, et faites cuire."
+        },
+        {
+          name: "Pain protéiné au lupin",
+          ingredients: ["Farine de lupin", "Farine de riz", "Levure", "Eau"],
+          instructions: "Pétrissez la pâte, laissez lever, et cuisez au four."
+        },
+        {
+          name: "Houmous au lupin",
+          ingredients: ["Pois chiches", "Farine de lupin", "Ail", "Citron"],
+          instructions: "Mixez tous les ingrédients pour obtenir une consistance lisse."
+        },
+        {
+          name: "Biscotti au lupin",
+          ingredients: ["Farine de lupin", "Amandes", "Sucre", "Œufs"],
+          instructions: "Préparez la pâte, façonnez en biscotti, et cuisez au four."
+        },
+        {
+          name: "Velouté au lupin",
+          ingredients: ["Farine de lupin", "Bouillon de légumes", "Crème végétale"],
+          instructions: "Faites chauffer le bouillon, ajoutez la farine, et mixez."
+        }
+      ],
+      oeuf: [
+        {
+          name: "Omelette classique",
+          ingredients: ["Œufs", "Sel", "Poivre", "Beurre"],
+          instructions: "Battez les œufs, cuisez à la poêle avec du beurre."
+        },
+        {
+          name: "Quiche lorraine",
+          ingredients: ["Œufs", "Crème", "Lardons", "Pâte feuilletée"],
+          instructions: "Disposez les ingrédients sur la pâte et cuisez au four."
+        },
+        {
+          name: "Flan aux œufs",
+          ingredients: ["Œufs", "Lait", "Sucre", "Vanille"],
+          instructions: "Mélangez les ingrédients, versez dans un moule, et cuisez au bain-marie."
+        },
+        {
+          name: "Œufs brouillés",
+          ingredients: ["Œufs", "Beurre", "Sel", "Poivre"],
+          instructions: "Battez les œufs et cuisez doucement à la poêle."
+        },
+        {
+          name: "Salade aux œufs durs",
+          ingredients: ["Œufs durs", "Salade verte", "Tomates", "Vinaigrette"],
+          instructions: "Mélangez les ingrédients pour une salade fraîche."
+        }
+      ],
+      mollusques: [
+        {
+          name: "Risotto aux champignons",
+          ingredients: ["Riz arborio", "Champignons", "Bouillon de légumes", "Parmesan"],
+          instructions: "Faites cuire le riz avec le bouillon, ajoutez les champignons."
+        },
+        {
+          name: "Tacos aux haricots rouges",
+          ingredients: ["Tortillas", "Haricots rouges", "Légumes variés", "Sauce épicée"],
+          instructions: "Garnissez les tortillas avec les haricots et les légumes."
+        },
+        {
+          name: "Pizza végétarienne",
+          ingredients: ["Pâte à pizza", "Tomates", "Mozzarella", "Basilic"],
+          instructions: "Ajoutez les ingrédients sur la pâte et cuisez au four."
+        },
+        {
+          name: "Velouté de légumes",
+          ingredients: ["Carottes", "Pommes de terre", "Crème végétale", "Herbes"],
+          instructions: "Faites cuire les légumes, puis mixez-les avec la crème."
+        },
+        {
+          name: "Salade composée",
+          ingredients: ["Salade verte", "Olives", "Concombre", "Vinaigrette maison"],
+          instructions: "Mélangez les ingrédients dans un grand bol."
+        }
+      ],
+      moutarde: [
+        {
+          name: "Vinaigrette maison à la moutarde",
+          ingredients: ["Moutarde", "Huile d'olive", "Vinaigre", "Sel"],
+          instructions: "Mélangez tous les ingrédients dans un bol."
+        },
+        {
+          name: "Poulet à la moutarde",
+          ingredients: ["Poulet", "Moutarde", "Crème fraîche", "Herbes"],
+          instructions: "Faites cuire le poulet, ajoutez la sauce moutarde et servez."
+        },
+        {
+          name: "Gratin de pommes de terre",
+          ingredients: ["Pommes de terre", "Crème fraîche", "Moutarde", "Fromage râpé"],
+          instructions: "Disposez les pommes de terre en couches, ajoutez la sauce, et cuisez au four."
+        },
+        {
+          name: "Salade au poulet et moutarde",
+          ingredients: ["Poulet", "Salade verte", "Tomates", "Vinaigrette à la moutarde"],
+          instructions: "Mélangez les ingrédients pour une salade fraîche et savoureuse."
+        },
+        {
+          name: "Tarte au saumon et moutarde",
+          ingredients: ["Pâte brisée", "Saumon", "Crème", "Moutarde"],
+          instructions: "Disposez les ingrédients sur la pâte et cuisez au four."
+        }
+      ],
+      sesame: [
+        {
+          name: "Poulet au sésame",
+          ingredients: ["Poulet", "Graines de sésame", "Sauce soja", "Miel"],
+          instructions: "Faites mariner le poulet, cuisez-le, et saupoudrez de graines de sésame."
+        },
+        {
+          name: "Salade asiatique au sésame",
+          ingredients: ["Laitue", "Carottes", "Graines de sésame", "Vinaigrette au soja"],
+          instructions: "Mélangez les légumes, ajoutez la vinaigrette et saupoudrez de sésame."
+        },
+        {
+          name: "Nouilles sautées au sésame",
+          ingredients: ["Nouilles de riz", "Graines de sésame", "Légumes", "Sauce soja"],
+          instructions: "Faites sauter les nouilles avec les légumes et le sésame."
+        },
+        {
+          name: "Pain au sésame maison",
+          ingredients: ["Farine", "Eau", "Graines de sésame", "Levure"],
+          instructions: "Pétrissez la pâte, saupoudrez de sésame, et cuisez au four."
+        },
+        {
+          name: "Biscuits aux graines de sésame",
+          ingredients: ["Farine", "Graines de sésame", "Sucre", "Beurre"],
+          instructions: "Mélangez les ingrédients, façonnez en biscuits, et cuisez au four."
+        }
+      ],
+      soja: [
+        {
+          name: "Curry de légumes au tofu",
+          ingredients: ["Légumes variés", "Tofu", "Lait de coco", "Épices pour curry"],
+          instructions: "Faites cuire les légumes avec le tofu et les épices."
+        },
+        {
+          name: "Salade au tofu mariné",
+          ingredients: ["Tofu", "Salade verte", "Tomates", "Vinaigrette au soja"],
+          instructions: "Marinez le tofu, mélangez avec la salade, et servez frais."
+        },
+        {
+          name: "Nouilles au tofu et soja",
+          ingredients: ["Nouilles de riz", "Tofu", "Sauce soja", "Légumes variés"],
+          instructions: "Faites sauter les nouilles avec le tofu et la sauce."
+        },
+        {
+          name: "Burger au tofu",
+          ingredients: ["Tofu", "Pain burger", "Salade", "Tomates", "Sauce soja"],
+          instructions: "Disposez le tofu et les ingrédients dans le pain burger."
+        },
+        {
+          name: "Stir-fry au soja",
+          ingredients: ["Légumes variés", "Sauce soja", "Tofu", "Graines de sésame"],
+          instructions: "Faites sauter les légumes avec la sauce soja et les graines de sésame."
+        }
+      ],
+      sulfites: [
+        {
+          name: "Salade de quinoa aux légumes",
+          ingredients: ["Quinoa", "Tomates", "Concombre", "Vinaigrette maison sans sulfites"],
+          instructions: "Mélangez tous les ingrédients dans un bol."
+        },
+        {
+          name: "Soupe de légumes maison",
+          ingredients: ["Pommes de terre", "Carottes", "Courgettes", "Bouillon de légumes sans sulfites"],
+          instructions: "Faites cuire les légumes, mixez-les, et servez chaud."
+        },
+        {
+          name: "Pâte à pizza sans sulfites",
+          ingredients: ["Farine", "Eau", "Levure", "Sel"],
+          instructions: "Pétrissez la pâte et garnissez-la à votre goût."
+        },
+        {
+          name: "Poulet au citron",
+          ingredients: ["Poulet", "Citron", "Herbes fraîches", "Huile d'olive"],
+          instructions: "Faites mariner le poulet avec le citron et les herbes avant de le cuire."
+        },
+        {
+          name: "Risotto au safran",
+          ingredients: ["Riz arborio", "Bouillon sans sulfites", "Safran", "Parmesan"],
+          instructions: "Faites cuire le riz avec le bouillon et le safran, puis ajoutez le parmesan."
+        }
+      ]
+    };
+    function displayRecipes(recipes) {
+      recipeList.innerHTML = recipes.map(recipe => `
+      <li>
+        <b>${recipe.name}</b>
+        <button class="view-recipe" data-name="${recipe.name}">Voir Détails</button>
+      </li>
+    `).join("");
+      document.querySelectorAll(".view-recipe").forEach(button => {
+        button.addEventListener("click", () => {
+          const recipeName = button.dataset.name;
+          const recipe = recipes.find(r => r.name === recipeName);
+          showRecipeDetails(recipe);
+        });
+      });
+    }
+    function showRecipeDetails(recipe) {
+      document.getElementById("recipe-title").textContent = recipe.name;
+      document.getElementById("recipe-ingredients").textContent = `Ingrédients : ${recipe.ingredients.join(", ")}`;
+      document.getElementById("recipe-instructions").textContent = `Instructions : ${recipe.instructions}`;
+      recipeDetails.style.display = "block";
+      document.getElementById("close-details").addEventListener("click", () => {
+        recipeDetails.style.display = "none";
+      });
+    }
+    searchButton.addEventListener("click", () => {
+      const selectedAllergies = Array.from(document.getElementById("allergies").selectedOptions).map(option => option.value);
+      const recipesToShow = selectedAllergies.flatMap(allergy => allergyRecipes[allergy] || []);
+      displayRecipes(recipesToShow);
+    });
+  });
+</script>
+</body>
+</html>

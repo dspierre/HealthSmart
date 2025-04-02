@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petites Victoires</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        body.dark {
+            background-color: #34495e;
+            color: #fff;
+        }
+        .container {
+            margin: auto;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #70e0b6;
+        }
+        textarea, input, select, button {
+            width: 70%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            text-align: left;
+            background: #f4f4f9;
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 5px solid #70e0b6;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        ul li.added {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        ul li.removed {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+        .btn-group button {
+            margin-top: 5px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .edit-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .edit-btn:hover {
+            background-color: #27ae60;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .delete-btn i, .edit-btn i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎉 Petites Victoires 🎉</h1>
+    <textarea id="victoryInput" placeholder="Quelle est votre petite victoire ?"></textarea>
+    <select id="categoryInput">
+        <option value="Personnel">Personnel</option>
+        <option value="Professionnel">Professionnel</option>
+    </select>
+    <input type="date" id="dateInput">
+    <button id="addVictoryButton">Ajouter une Victoire</button>
+    <select id="filterCategory">
+        <option value="">Filtrer par catégorie</option>
+        <option value="Personnel">Personnel</option>
+        <option value="Professionnel">Professionnel</option>
+    </select>
+    <input type="date" id="filterDate">
+    <input type="text" id="filterText" placeholder="Filtrer par texte">
+    <button id="filterButton">Filtrer</button>
+    <ul id="victoryList"></ul>
+    <audio id="motivationSound" src="https://www.soundjay.com/human/applause-01.mp3"></audio>
+    <h2 id="pointsDisplay">Points gagnés : 0</h2>
+</div>
+<script>
+    const victories = JSON.parse(localStorage.getItem('victories')) || [];
+    const victoryInput = document.getElementById('victoryInput');
+    const categoryInput = document.getElementById('categoryInput');
+    const dateInput = document.getElementById('dateInput');
+    const addVictoryButton = document.getElementById('addVictoryButton');
+    const filterCategory = document.getElementById('filterCategory');
+    const filterDate = document.getElementById('filterDate');
+    const filterText = document.getElementById('filterText');
+    const filterButton = document.getElementById('filterButton');
+    const victoryList = document.getElementById('victoryList');
+    const motivationSound = document.getElementById('motivationSound');
+    const pointsDisplay = document.getElementById('pointsDisplay');
+    let points = Number(localStorage.getItem('points')) || 0;
+    const saveVictories = () => {
+        localStorage.setItem('victories', JSON.stringify(victories));
+    };
+    const savePoints = () => {
+        localStorage.setItem('points', points);
+    };
+    const displayVictory = (victory, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>${victory.date} - [${victory.category}] ${victory.text}</span>
+            <div class="btn-group">
+                <button class="edit-btn" onclick="editVictory(${index})"><i class="fas fa-edit"></i>Modifier</button>
+                <button class="delete-btn" onclick="deleteVictory(${index})"><i class="fas fa-trash"></i>Supprimer</button>
+            </div>
+        `;
+        victoryList.appendChild(li);
+        li.classList.add('added');
+    };
+    const updateVictoryList = () => {
+        victoryList.innerHTML = '';
+        victories.forEach((victory, index) => displayVictory(victory, index));
+    };
+    const updatePointsDisplay = () => {
+        pointsDisplay.textContent = `Points gagnés : ${points}`;
+    };
+    const playMotivationSound = () => {
+        motivationSound.currentTime = 0; // Réinitialise le son
+        motivationSound.play(); // Joue le son motivant
+    };
+    const addVictory = () => {
+        const text = victoryInput.value.trim();
+        const category = categoryInput.value;
+        const date = dateInput.value || new Date().toISOString().split('T')[0];
+        if (!text) {
+            alert('Veuillez entrer une victoire.');
+            return;
+        }
+        victories.push({ text, category, date });
+        saveVictories();
+        updateVictoryList();
+        playMotivationSound(); // Lecture du son motivant
+        // Augmente les points
+        points += 50;
+        savePoints();
+        updatePointsDisplay();
+        victoryInput.value = '';
+        dateInput.value = '';
+        // Notification après ajout
+        if (Notification.permission === "granted") {
+            new Notification("🎉 Victoire ajoutée !", {
+                body: `Bravo pour votre succès : "${text}"`,
+                icon: "https://cdn-icons-png.flaticon.com/512/846/846607.png"
+            });
+        }
+    };
+    const deleteVictory = (index) => {
+        const li = victoryList.children[index];
+        li.classList.add('removed');
+        setTimeout(() => {
+            victories.splice(index, 1);
+            saveVictories();
+            updateVictoryList();
+        }, 300);
+    };
+    const editVictory = (index) => {
+        const newText = prompt('Modifier votre victoire :', victories[index].text);
+        if (newText) {
+            victories[index].text = newText.trim();
+            saveVictories();
+            updateVictoryList();
+        }
+    };
+    const filterVictories = () => {
+        const categoryFilter = filterCategory.value;
+        const dateFilter = filterDate.value;
+        const textFilter = filterText.value.toLowerCase();
+        victoryList.innerHTML = '';
+        victories
+            .filter(v => (!categoryFilter || v.category === categoryFilter) &&
+                (!dateFilter || v.date === dateFilter) &&
+                (!textFilter || v.text.toLowerCase().includes(textFilter)))
+            .forEach((victory, index) => displayVictory(victory, index));
+    };
+    // Demande la permission de notifications
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+    // Configure un rappel quotidien
+    const setDailyReminder = () => {
+        const now = new Date();
+        let nextReminder = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate() + 1, // Le lendemain
+            17, // Heure du rappel (9h)
+            0,
+            0
+        );
+        // Vérifiez si le temps restant est valide
+        let timeUntilReminder = nextReminder - now;
+        if (timeUntilReminder <= 0) {
+            // Recalculez pour une date valide
+            nextReminder = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + 1,
+                9, 0, 0
+            );
+            timeUntilReminder = nextReminder - now;
+        }
+
+        console.log("Rappel programmé à :", nextReminder);
+        console.log("Temps restant jusqu'au rappel (ms) :", timeUntilReminder);
+
+        setTimeout(() => {
+            // Vérifiez la permission avant d'envoyer une notification
+            if (Notification.permission === "granted") {
+                new Notification("📅 N'oubliez pas vos victoires !", {
+                    body: "Prenez un moment pour noter vos succès du jour.",
+                    icon: "https://cdn-icons-png.flaticon.com/512/846/846607.png"
+                });
+            } else {
+                console.log("Permission de notification refusée ou non demandée.");
+            }
+            // Replanifiez le rappel
+            setDailyReminder();
+        }, timeUntilReminder);
+    };
+    // Demander la permission de notification
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                console.log("Permission de notifications accordée !");
+                setDailyReminder(); // Activez les rappels si la permission est donnée
+            } else {
+                console.log("Permission de notifications refusée.");
+            }
+        });
+    } else {
+        setDailyReminder(); // Activez les rappels directement si la permission a déjà été donnée
+    }
+    filterButton.addEventListener('click', filterVictories);
+    addVictoryButton.addEventListener('click', addVictory);
+    updateVictoryList();
+    updatePointsDisplay();
+</script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport Annuel de Santé</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <style>
+        /* Styles principaux */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            color: #70e0b6;
+            margin-bottom: 20px;
+        }
+        select, button, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #56c29c;
+        }
+        .tips {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        /* Mode sombre */
+        body.dark-mode {
+            background-color: #2c3e50;
+            color: #fff;
+        }
+        .container.dark-mode {
+            background-color: #2c3e50;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #loader {
+            font-size: 16px;
+            color: #70e0b6;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Rapport Annuel de Santé</h1>
+    <div id="loader">Chargement en cours...</div>
+    <!-- Statistiques Clés -->
+    <div id="statistiques">
+        <h2>Statistiques Clés</h2>
+        <ul>
+            <li>Total des rendez-vous : <span id="total-rendez-vous">0</span></li>
+            <li>Dépenses médicales : <span id="depenses">0 €</span></li>
+            <li>Progrès santé : <span id="progres-sante">0 %</span></li>
+            <li>Nombre de pas : <span id="pas">0 pas</span></li>
+            <li>Sommeil : <span id="sommeil_en_heure">0 heures</span></li>
+            <li>Consommation liquide : <span id="Comsomation_litre">0 litres</span></li>
+            <li>Fréquence cardiaque (bpm) : <span id="Fréquence_cardiaque">0 bpm</span></li>
+        </ul>
+    </div>
+    <!-- Filtrage par Catégorie -->
+    <select id="category-filter" aria-label="Filtrer par catégorie">
+        <option value="totalRendezVous">Rendez-vous</option>
+        <option value="depenses">Dépenses médicales</option>
+        <option value="progresSante">Progrès santé</option>
+        <option value="nombrePas">Nombre de pas</option>
+        <option value="sommeil">Sommeil</option>
+        <option value="consommationLiquide">Consommation liquide</option>
+        <option value="frequenceCardiaque">Fréquence cardiaque</option>
+    </select>
+    <select id="time-filter" aria-label="Filtrer par période">
+        <option value="week">Cette semaine</option>
+        <option value="month">Ce mois</option>
+        <option value="specific-month">Mois spécifique</option>
+    </select>
+    <!-- Graphique -->
+    <div id="graphiques">
+        <canvas id="graphique-sante"></canvas>
+    </div>
+    <!-- Boutons -->
+    <button id="toggle-dark-mode" aria-label="Activer ou désactiver le mode sombre">Activer/Désactiver le Mode Sombre</button>
+    <button id="download-pdf">Télécharger le Rapport en PDF</button>
+    <button id="share-report">Partager le Rapport</button>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const ctx = document.getElementById("graphique-sante").getContext("2d");
+        const loader = document.getElementById("loader");
+        const categoryFilter = document.getElementById("category-filter");
+        let chart;
+        // Fonction pour récupérer les données depuis l'API
+        const fetchDataFromAPI = async () => {
+            loader.style.display = "block"; // Affiche le loader
+            try {
+                const response = await fetch('http://localhost:3000/api/stats'); // URL API
+                if (!response.ok) {
+                    throw new Error(`Erreur réseau : ${response.status}`);
+                }
+                const data = await response.json(); // Récupération des données
+                loader.style.display = "none"; // Masquer le loader après le chargement
+                return data; // Retourne les données
+            } catch (error) {
+                console.error("Erreur lors de la récupération des données :", error);
+                alert("Impossible de charger les données. Veuillez vérifier l'API.");
+                loader.style.display = "none";
+                return null; // Retourne null en cas d'erreur
+            }
+        };
+        // Fonction pour mettre à jour les statistiques affichées
+        const updateStatistics = (data) => {
+            if (!data) {
+                console.error("Données invalides reçues, annulation de la mise à jour.");
+                return;
+            }
+            document.getElementById("total-rendez-vous").textContent = data.totalRendezVous || 0;
+            document.getElementById("depenses").textContent = (data.depenses || 0) + " €";
+            document.getElementById("progres-sante").textContent = (data.progresSante || 0) + " %";
+            document.getElementById("pas").textContent = (data.nombrePas || 0) + " pas";
+            document.getElementById("sommeil_en_heure").textContent = (data.sommeil || 0) + " heures";
+            document.getElementById("Comsomation_litre").textContent = (data.consommationLiquide || 0) + " litres";
+            document.getElementById("Fréquence_cardiaque").textContent = (data.frequenceCardiaque || 0) + " bpm";
+        };
+        // Fonction pour créer un graphique basé sur la catégorie sélectionnée
+        const createChartByCategory = (category, data) => {
+            if (!data) {
+                console.error("Impossible de créer le graphique, données invalides.");
+                return;
+            }
+            const categoriesMap = {
+                totalRendezVous: {
+                    label: "Total des Rendez-vous",
+                    data: data.totalRendezVous,
+                    color: "green"
+                },
+                depenses: {
+                    label: "Dépenses Médicales (€)",
+                    data: data.depenses,
+                    color: "blue"
+                },
+                progresSante: {
+                    label: "Progrès Santé (%)",
+                    data: data.progresSante,
+                    color: "orange"
+                },
+                nombrePas: {
+                    label: "Nombre de Pas",
+                    data: data.nombrePas,
+                    color: "purple"
+                },
+                sommeil: {
+                    label: "Sommeil (heures)",
+                    data: data.sommeil,
+                    color: "cyan"
+                },
+                consommationLiquide: {
+                    label: "Consommation Liquide (litres)",
+                    data: data.consommationLiquide,
+                    color: "teal"
+                },
+                frequenceCardiaque: {
+                    label: "Fréquence Cardiaque (bpm)",
+                    data: data.frequenceCardiaque,
+                    color: "red"
+                }
+            };
+            if (!categoriesMap[category]) {
+                console.error("Catégorie non valide :", category);
+                return;
+            }
+            const { label, data: chartData, color } = categoriesMap[category];
+            if (chart) {
+                chart.destroy(); // Détruire le graphique précédent
+            }
+            chart = new Chart(ctx, {
+                type: "line", // Graphique en lignes
+                data: {
+                    labels: ["Semaine 1", "Semaine 2", "Semaine 3", "Semaine 4"], // Noms des périodes
+                    datasets: [{
+                        label: label,
+                        data: chartData,
+                        borderColor: color,
+                        backgroundColor: `${color}33`, // Couleur avec transparence
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function (context) {
+                                    return `Valeur : ${context.raw}`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: "top"
+                        }
+                    }
+                }
+            });
+        };
+        // Initialisation de la page
+        const init = async () => {
+            const data = await fetchDataFromAPI(); // Récupération des données depuis l'API
+            if (!data) return; // Si les données ne sont pas disponibles, annule
+            updateStatistics(data); // Met à jour les statistiques affichées
+            // Crée un graphique pour la catégorie sélectionnée
+            categoryFilter.addEventListener("change", () => {
+                const selectedCategory = categoryFilter.value;
+                createChartByCategory(selectedCategory, data); // Crée un graphique pour la catégorie sélectionnée
+            });
+            // Affiche initialement un graphique basé sur la première catégorie
+            createChartByCategory(categoryFilter.value, data);
+        };
+        init(); // Démarre l'application
+    });
+</script>
+</body>
+</html>
