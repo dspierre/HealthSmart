@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petites Victoires</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,10 +11,11 @@
             padding: 0;
             text-align: center;
             background-color: #f9f9f9;
+            transition: background-color 0.3s, color 0.3s;
         }
         body.dark {
-            background-color: #34495e;
-            color: #fff;
+            background-color: #2c3e50;
+            color: #ecf0f1;
         }
         .container {
             margin: auto;
@@ -24,12 +24,16 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        body.dark .container {
+            background: #34495e;
         }
         h1 {
             color: #70e0b6;
         }
-        textarea, input, select, button {
-            width: 70%;
+        textarea, select, button {
+            width: 80%;
             margin: 10px 0;
             padding: 10px;
             font-size: 1rem;
@@ -48,144 +52,147 @@
             border-left: 5px solid #70e0b6;
             border-radius: 6px;
             display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.3s;
         }
-        ul li.added {
-            transform: scale(1.05);
-            opacity: 1;
+        body.dark ul li {
+            background: #2c3e50;
+            border-left: 5px solid #1abc9c;
         }
-        ul li.removed {
-            transform: scale(0.9);
-            opacity: 0;
-        }
-        .btn-group button {
-            margin-top: 5px;
-            padding: 5px 10px;
-            font-size: 0.9rem;
+        .delete-btn, .edit-btn, .sort-btn {
+            background-color: #70e0b6;
             border: none;
+            padding: 5px 10px;
+            color: white;
             border-radius: 4px;
             cursor: pointer;
+            margin: 0 5px;
             transition: background-color 0.3s ease;
         }
-        .edit-btn {
-            background-color: #2ecc71;
-            color: white;
+        .delete-btn:hover {
+            background-color: #e74c3c;
         }
         .edit-btn:hover {
-            background-color: #27ae60;
+            background-color: #70e0b6;
         }
-        .delete-btn {
-            background-color: #e74c3c;
+        .sort-btn:hover {
+            background-color:  #70e0b6;
+        }
+        .progress-container {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 20px;
+            width: 0;
+            background-color: #70e0b6;
+            text-align: center;
+            line-height: 20px;
             color: white;
+            transition: width 0.3s;
         }
-        .delete-btn:hover {
-            background-color: #c0392b;
+        .badge {
+            color: #70e0b6;
+            font-weight: bold;
+            margin-top: 10px;
         }
-        .delete-btn i, .edit-btn i {
-            margin-right: 5px;
+        .dark-mode-toggle {
+            background-color: #95a5a6;
+            border: none;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .dark-mode-toggle:hover {
+            background-color: #7f8c8d;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>🎉 Petites Victoires 🎉</h1>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Activer/Désactiver Mode Sombre</button>
     <textarea id="victoryInput" placeholder="Quelle est votre petite victoire ?"></textarea>
     <select id="categoryInput">
         <option value="Personnel">Personnel</option>
         <option value="Professionnel">Professionnel</option>
     </select>
-    <input type="date" id="dateInput">
     <button id="addVictoryButton">Ajouter une Victoire</button>
-    <select id="filterCategory">
-        <option value="">Filtrer par catégorie</option>
-        <option value="Personnel">Personnel</option>
-        <option value="Professionnel">Professionnel</option>
-    </select>
-    <input type="date" id="filterDate">
-    <input type="text" id="filterText" placeholder="Filtrer par texte">
-    <button id="filterButton">Filtrer</button>
+    <h3 id="totalPoints">Points Totaux : 0</h3>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p id="badgeMessage" class="badge"></p>
+    <button class="sort-btn" onclick="sortVictories()">Trier par Points</button>
     <ul id="victoryList"></ul>
-    <audio id="motivationSound" src="https://www.soundjay.com/human/applause-01.mp3"></audio>
-    <h2 id="pointsDisplay">Points gagnés : 0</h2>
 </div>
 <script>
     const victories = JSON.parse(localStorage.getItem('victories')) || [];
     const victoryInput = document.getElementById('victoryInput');
     const categoryInput = document.getElementById('categoryInput');
-    const dateInput = document.getElementById('dateInput');
     const addVictoryButton = document.getElementById('addVictoryButton');
-    const filterCategory = document.getElementById('filterCategory');
-    const filterDate = document.getElementById('filterDate');
-    const filterText = document.getElementById('filterText');
-    const filterButton = document.getElementById('filterButton');
     const victoryList = document.getElementById('victoryList');
-    const motivationSound = document.getElementById('motivationSound');
-    const pointsDisplay = document.getElementById('pointsDisplay');
-    let points = Number(localStorage.getItem('points')) || 0;
+    const totalPoints = document.getElementById('totalPoints');
+    const progressBar = document.getElementById('progressBar');
+    const badgeMessage = document.getElementById('badgeMessage');
     const saveVictories = () => {
         localStorage.setItem('victories', JSON.stringify(victories));
+    }
+    const updatePoints = () => {
+        const total = victories.reduce((sum, victory) => sum + (victory.points || 0), 0);
+        totalPoints.textContent = `Points Totaux : ${total}`;
+        if (total >= 100 && !badgeMessage.textContent) {
+            badgeMessage.textContent = '🎉 Félicitations, vous avez atteint 100 points !';
+        }
     };
-    const savePoints = () => {
-        localStorage.setItem('points', points);
+    const updateProgressBar = () => {
+        const percentage = Math.min((victories.length / 10) * 100, 100);
+        progressBar.style.width = percentage + '%';
     };
     const displayVictory = (victory, index) => {
         const li = document.createElement('li');
         li.innerHTML = `
-            <span>${victory.date} - [${victory.category}] ${victory.text}</span>
-            <div class="btn-group">
-                <button class="edit-btn" onclick="editVictory(${index})"><i class="fas fa-edit"></i>Modifier</button>
-                <button class="delete-btn" onclick="deleteVictory(${index})"><i class="fas fa-trash"></i>Supprimer</button>
-            </div>
-        `;
+      <span>[${victory.category}] ${victory.text} (${victory.date})</span>
+      <div>
+        <button class="edit-btn" onclick="editVictory(${index})">Modifier</button>
+        <button class="delete-btn" onclick="deleteVictory(${index})">Supprimer</button>
+      </div>
+    `;
         victoryList.appendChild(li);
-        li.classList.add('added');
     };
     const updateVictoryList = () => {
         victoryList.innerHTML = '';
         victories.forEach((victory, index) => displayVictory(victory, index));
     };
-    const updatePointsDisplay = () => {
-        pointsDisplay.textContent = `Points gagnés : ${points}`;
-    };
-    const playMotivationSound = () => {
-        motivationSound.currentTime = 0; // Réinitialise le son
-        motivationSound.play(); // Joue le son motivant
-    };
     const addVictory = () => {
         const text = victoryInput.value.trim();
         const category = categoryInput.value;
-        const date = dateInput.value || new Date().toISOString().split('T')[0];
+        const date = new Date().toISOString().split('T')[0];
+        const points = 50;
         if (!text) {
             alert('Veuillez entrer une victoire.');
             return;
         }
-        victories.push({ text, category, date });
+        victories.push({ text, category, date, points });
         saveVictories();
         updateVictoryList();
-        playMotivationSound(); // Lecture du son motivant
-        // Augmente les points
-        points += 50;
-        savePoints();
-        updatePointsDisplay();
+        updatePoints();
+        updateProgressBar();
         victoryInput.value = '';
-        dateInput.value = '';
-        // Notification après ajout
-        if (Notification.permission === "granted") {
-            new Notification("🎉 Victoire ajoutée !", {
-                body: `Bravo pour votre succès : "${text}"`,
-                icon: "https://cdn-icons-png.flaticon.com/512/846/846607.png"
-            });
-        }
-    };
-    const deleteVictory = (index) => {
-        const li = victoryList.children[index];
-        li.classList.add('removed');
-        setTimeout(() => {
-            victories.splice(index, 1);
-            saveVictories();
-            updateVictoryList();
-        }, 300);
     };
     const editVictory = (index) => {
         const newText = prompt('Modifier votre victoire :', victories[index].text);
@@ -195,79 +202,24 @@
             updateVictoryList();
         }
     };
-    const filterVictories = () => {
-        const categoryFilter = filterCategory.value;
-        const dateFilter = filterDate.value;
-        const textFilter = filterText.value.toLowerCase();
-        victoryList.innerHTML = '';
-        victories
-            .filter(v => (!categoryFilter || v.category === categoryFilter) &&
-                (!dateFilter || v.date === dateFilter) &&
-                (!textFilter || v.text.toLowerCase().includes(textFilter)))
-            .forEach((victory, index) => displayVictory(victory, index));
+    const deleteVictory = (index) => {
+        victories.splice(index, 1);
+        saveVictories();
+        updateVictoryList();
+        updatePoints();
+        updateProgressBar();
     };
-    // Demande la permission de notifications
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
-    // Configure un rappel quotidien
-    const setDailyReminder = () => {
-        const now = new Date();
-        let nextReminder = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate() + 1, // Le lendemain
-            17, // Heure du rappel (9h)
-            0,
-            0
-        );
-        // Vérifiez si le temps restant est valide
-        let timeUntilReminder = nextReminder - now;
-        if (timeUntilReminder <= 0) {
-            // Recalculez pour une date valide
-            nextReminder = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + 1,
-                9, 0, 0
-            );
-            timeUntilReminder = nextReminder - now;
-        }
-
-        console.log("Rappel programmé à :", nextReminder);
-        console.log("Temps restant jusqu'au rappel (ms) :", timeUntilReminder);
-
-        setTimeout(() => {
-            // Vérifiez la permission avant d'envoyer une notification
-            if (Notification.permission === "granted") {
-                new Notification("📅 N'oubliez pas vos victoires !", {
-                    body: "Prenez un moment pour noter vos succès du jour.",
-                    icon: "https://cdn-icons-png.flaticon.com/512/846/846607.png"
-                });
-            } else {
-                console.log("Permission de notification refusée ou non demandée.");
-            }
-            // Replanifiez le rappel
-            setDailyReminder();
-        }, timeUntilReminder);
+    const sortVictories = () => {
+        victories.sort((a, b) => b.points - a.points);
+        updateVictoryList();
     };
-    // Demander la permission de notification
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                console.log("Permission de notifications accordée !");
-                setDailyReminder(); // Activez les rappels si la permission est donnée
-            } else {
-                console.log("Permission de notifications refusée.");
-            }
-        });
-    } else {
-        setDailyReminder(); // Activez les rappels directement si la permission a déjà été donnée
-    }
-    filterButton.addEventListener('click', filterVictories);
+    const toggleDarkMode = () => {
+        document.body.classList.toggle('dark');
+    };
     addVictoryButton.addEventListener('click', addVictory);
     updateVictoryList();
-    updatePointsDisplay();
+    updatePoints();
+    updateProgressBar();
 </script>
 </body>
 </html>

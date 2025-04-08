@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santé Connectée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #34d8c5;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+        .data-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            width: 300px;
+        }
+        button {
+            background-color: #34d8c5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #28b4a3;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <h1>Santé Connectée</h1>
+    </nav>
+</header>
+<main>
+    <section id="fit-data">
+        <h2>Résumé de votre activité</h2>
+        <div class="data-box">
+            <p><strong>Nombre de pas :</strong> <span id="steps">Chargement...</span></p>
+            <p><strong>Énergies dépensées :</strong> <span id="calories">Chargement...</span> kcal</p>
+            <p><strong>Distance parcourue :</strong> <span id="distance">Chargement...</span> km</p>
+        </div>
+        <button id="authorizeButton">Se connecter à Google Fit</button>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2025 Santé Connectée. Tous droits réservés.</p>
+</footer>
+<script src="https://apis.google.com/js/api.js"></script>
+<script>
+    // Charger le client Google API
+    gapi.load('client:auth2', function() {
+        gapi.auth2.init({
+            client_id: 'VOTRE_CLIENT_ID', // Remplacez par votre ID client Google
+            scope: 'https://www.googleapis.com/auth/fitness.activity.read'
+        }).then(function() {
+            console.log("Google API client chargé !");
+        });
+    });
+
+    // Bouton d'autorisation
+    const authorizeButton = document.getElementById('authorizeButton');
+    authorizeButton.addEventListener('click', async function() {
+        const authInstance = gapi.auth2.getAuthInstance();
+        if (!authInstance.isSignedIn.get()) {
+            await authInstance.signIn(); // Demande à l'utilisateur de se connecter
+        }
+        fetchFitData(); // Récupération des données après connexion
+    });
+    // Récupérer les données Google Fit
+    async function fetchFitData() {
+        try {
+            const response = await gapi.client.request({
+                path: 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
+                method: 'POST',
+                body: {
+                    aggregateBy: [
+                        { dataTypeName: 'com.google.step_count.delta' },
+                        { dataTypeName: 'com.google.calories.expended' },
+                        { dataTypeName: 'com.google.distance.delta' }
+                    ],
+                    bucketByTime: { durationMillis: 86400000 }, // Dernières 24 heures
+                    startTimeMillis: Date.now() - (24 * 60 * 60 * 1000),
+                    endTimeMillis: Date.now()
+                }
+            });
+            // Parse les données
+            let steps = 0, calories = 0, distance = 0;
+            response.result.bucket.forEach(bucket => {
+                bucket.dataset.forEach(dataset => {
+                    dataset.point.forEach(point => {
+                        if (point.dataTypeName === 'com.google.step_count.delta') {
+                            steps += point.value[0].intVal;
+                        } else if (point.dataTypeName === 'com.google.calories.expended') {
+                            calories += point.value[0].fpVal;
+                        } else if (point.dataTypeName === 'com.google.distance.delta') {
+                            distance += point.value[0].fpVal / 1000; // Convertir en kilomètres
+                        }
+                    });
+                });
+            });
+            // Afficher les résultats
+            document.getElementById('steps').textContent = steps;
+            document.getElementById('calories').textContent = calories.toFixed(2);
+            document.getElementById('distance').textContent = distance.toFixed(2);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des données :', error);
+        }
+    }
+</script>
+</body>
+</html>

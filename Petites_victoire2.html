@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Petites Victoires</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      background-color: #f9f9f9;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+    }
+    .container {
+      margin: auto;
+      max-width: 600px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
+    }
+    body.dark .container {
+      background: #34495e;
+    }
+    h1 {
+      color: #70e0b6;
+    }
+    textarea, select, button {
+      width: 80%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    ul li {
+      text-align: left;
+      background: #f4f4f9;
+      margin: 10px 0;
+      padding: 10px;
+      border-left: 5px solid #70e0b6;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.3s;
+    }
+    body.dark ul li {
+      background: #2c3e50;
+      border-left: 5px solid #1abc9c;
+    }
+    .delete-btn, .edit-btn, .sort-btn {
+      background-color: #70e0b6;
+      border: none;
+      padding: 5px 10px;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0 5px;
+      transition: background-color 0.3s ease;
+    }
+    .delete-btn:hover {
+      background-color: #e74c3c;
+    }
+    .edit-btn:hover {
+      background-color: #70e0b6;
+    }
+    .sort-btn:hover {
+      background-color:  #70e0b6;
+    }
+    .progress-container {
+      margin-top: 20px;
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 20px;
+      width: 0;
+      background-color: #70e0b6;
+      text-align: center;
+      line-height: 20px;
+      color: white;
+      transition: width 0.3s;
+    }
+    .badge {
+      color: #70e0b6;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .dark-mode-toggle {
+      background-color: #95a5a6;
+      border: none;
+      padding: 5px 10px;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .dark-mode-toggle:hover {
+      background-color: #7f8c8d;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎉 Petites Victoires 🎉</h1>
+  <button class="dark-mode-toggle" onclick="toggleDarkMode()">Activer/Désactiver Mode Sombre</button>
+  <textarea id="victoryInput" placeholder="Quelle est votre petite victoire ?"></textarea>
+  <select id="categoryInput">
+    <option value="Personnel">Personnel</option>
+    <option value="Professionnel">Professionnel</option>
+  </select>
+  <button id="addVictoryButton">Ajouter une Victoire</button>
+  <h3 id="totalPoints">Points Totaux : 0</h3>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <p id="badgeMessage" class="badge"></p>
+  <button class="sort-btn" onclick="sortVictories()">Trier par Points</button>
+  <ul id="victoryList"></ul>
+</div>
+<script>
+  const victories = JSON.parse(localStorage.getItem('victories')) || [];
+  const victoryInput = document.getElementById('victoryInput');
+  const categoryInput = document.getElementById('categoryInput');
+  const addVictoryButton = document.getElementById('addVictoryButton');
+  const victoryList = document.getElementById('victoryList');
+  const totalPoints = document.getElementById('totalPoints');
+  const progressBar = document.getElementById('progressBar');
+  const badgeMessage = document.getElementById('badgeMessage');
+  const saveVictories = () => {
+    localStorage.setItem('victories', JSON.stringify(victories));
+  }
+  const updatePoints = () => {
+    const total = victories.reduce((sum, victory) => sum + (victory.points || 0), 0);
+    totalPoints.textContent = `Points Totaux : ${total}`;
+    if (total >= 100 && !badgeMessage.textContent) {
+      badgeMessage.textContent = '🎉 Félicitations, vous avez atteint 100 points !';
+    }
+  };
+  const updateProgressBar = () => {
+    const percentage = Math.min((victories.length / 10) * 100, 100);
+    progressBar.style.width = percentage + '%';
+  };
+  const displayVictory = (victory, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span>[${victory.category}] ${victory.text} (${victory.date})</span>
+      <div>
+        <button class="edit-btn" onclick="editVictory(${index})">Modifier</button>
+        <button class="delete-btn" onclick="deleteVictory(${index})">Supprimer</button>
+      </div>
+    `;
+    victoryList.appendChild(li);
+  };
+  const updateVictoryList = () => {
+    victoryList.innerHTML = '';
+    victories.forEach((victory, index) => displayVictory(victory, index));
+  };
+  const addVictory = () => {
+    const text = victoryInput.value.trim();
+    const category = categoryInput.value;
+    const date = new Date().toISOString().split('T')[0];
+    const points = 50;
+    if (!text) {
+      alert('Veuillez entrer une victoire.');
+      return;
+    }
+    victories.push({ text, category, date, points });
+    saveVictories();
+    updateVictoryList();
+    updatePoints();
+    updateProgressBar();
+    victoryInput.value = '';
+  };
+  const editVictory = (index) => {
+    const newText = prompt('Modifier votre victoire :', victories[index].text);
+    if (newText) {
+      victories[index].text = newText.trim();
+      saveVictories();
+      updateVictoryList();
+    }
+  };
+  const deleteVictory = (index) => {
+    victories.splice(index, 1);
+    saveVictories();
+    updateVictoryList();
+    updatePoints();
+    updateProgressBar();
+  };
+  const sortVictories = () => {
+    victories.sort((a, b) => b.points - a.points);
+    updateVictoryList();
+  };
+  const toggleDarkMode = () => {
+    document.body.classList.toggle('dark');
+  };
+  addVictoryButton.addEventListener('click', addVictory);
+  updateVictoryList();
+  updatePoints();
+  updateProgressBar();
+</script>
+</body>
+</html>

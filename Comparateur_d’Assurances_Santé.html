@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparateur de Banques</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Ensure you have this container in your HTML */
+        .main-container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+        .section-title h2 {
+            margin: 0;
+        }
+        .form-group, .input-container {
+            margin-bottom: 20px;
+        }
+        .form-group label, .input-container p {
+            font-weight: bold;
+        }
+        .form-group input, .input-container select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        /* Styles pour les menus déroulants */
+        select {
+            background-color: #70e0b6;
+            border: 2px solid #70e0b6;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            color: #70e0b6;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        /* Styles Généraux */
+        body {
+            font-family: 'Montserrat', sans-serif;  /* J'ai choisi 'Montserrat' pour tout le site */
+            background-color: #f0f2f5;  /* Couleur de fond uniforme */
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+        /* Pied de Page */
+        footer {
+            background-color: #70e0b6;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 60px;
+        }
+
+        /* En-tête et Navigation */
+        header {
+            background-color: #70e0b6;
+            padding: 10px 0;
+        }
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+        }
+        header nav ul li {
+            position: relative;
+        }
+        header nav ul li a {
+            text-decoration: none;
+            color: #ecf0f1;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        header nav ul li a:hover {
+            color: #1abc9c;
+        }
+        header nav ul li:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        /* Titre Principal */
+        h1 {
+            color: #ecf0f1;
+            text-align: center;  /* Correction de l'alignement */
+            margin: 0;
+        }
+        main h2 {
+            font-size: 36px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .content img {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .content p {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .operator-card h3 {
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+        }
+        /* Formulaire */
+        .form-section {
+            background-color: #fff;
+            padding: 40px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-section form {
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #70e0b6;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #70e0b6;
+            outline: none;
+        }
+        .btn:hover {
+            background-color: #70e0b6;
+        }
+        .btn i {
+            margin-left: 10px;
+        }
+        /* Pied de Page */
+        footer {
+            background-color: #70e0b6;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 60px;
+        }
+        footer p {
+            margin: 0;
+        }
+        /* Responsivité */
+        @media (max-width: 768px) {
+            /* Navigation Responsive */
+            header nav {
+                flex-direction: column;
+            }
+            header nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            /* Contenu Principal */
+            main {
+                margin: 20px auto;
+            }
+            /* Grille des Opérateurs */
+            .operator-card {
+                width: 100%;
+            }
+            /* Formulaire */
+            .form-section {
+                padding: 30px 15px;
+            }
+            /* Liste des Fonctionnalités */
+            .features-list {
+                padding: 0 20px;
+            }
+        }
+        /* Bouton */
+        .btn {
+            display: inline-block;
+            background-color: #70e0b6;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #70e0b6;
+        }
+        .dropdown-menu-custom {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            width: 100%;
+            padding: 10px 0;
+        }
+        .dropdown:hover .dropdown-menu-custom {
+            display: block;
+        }
+        .dropdown-item-custom {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+        }
+        .dropdown-item-custom:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown-item-custom img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Comparateur de mutuelle</h1>
+</header>
+<section class="banks-section">
+    <div class="main-container container">
+        <div class="dropdown mt-5">
+            <img src="bnp paribas_cardif.png" alt="BNP Paribas" class="bank-logo">
+            <img src="logoACM-modale.png" alt="Société Générale" class="bank-logo">
+            <img src="groupama.png" alt="Boursorama" class="bank-logo">
+            <img src="Caa-com_rvb.png" alt="Hello Bank" class="bank-logo">
+            <img src="CNP-24.png" alt="Crédit Agricole" class="bank-logo">
+            <img src="fortineo.png" alt="Fortuneo" class="bank-logo">
+        </div>
+        <div id="selected-bank" class="mt-4"></div>
+    </div>
+</section>
+<style>
+    .bank-logo {
+        width: 150px; /* Largeur fixe pour toutes les images */
+        height: 150px; /* Hauteur fixe pour toutes les images */
+        object-fit: contain; /* Maintient les proportions sans déformation */
+        margin: 10px; /* Ajoute un espace entre les images */
+    }
+    .dropdown {
+        display: flex; /* Place les images côte à côte */
+        flex-wrap: wrap; /* Permet le passage à la ligne si nécessaire */
+        justify-content: center; /* Centre les images horizontalement */
+        align-items: center; /* Centre les images verticalement */
+    }
+</style>
+<section class="form-section" style="margin-top: 60px;">
+    <form id="simulation-form">
+        <div class="form-group">
+            <section class="mutuelle-dropdown-section">
+                <div class="form-group">
+                    <label for="mutuelle-select">Choisissez une mutuelle :</label>
+                    <select id="mutuelle-select" class="form-control">
+                        <option value="">Sélectionnez votre mutuelle</option>
+                        <option value="Comparateur MutuelleSante">Comparateur MutuelleSante</option>
+                        <option value="Smeno">Smeno</option>
+                        <option value="Axa">Axa</option>
+                        <option value="Malakoff Médéric">Malakoff Médéric</option>
+                        <option value="MMA">MMA</option>
+                        <option value="AG2R La Mondiale">AG2R La Mondiale</option>
+                        <option value="Heyme">Heyme</option>
+                        <option value="Solimut">Solimut</option>
+                        <option value="Prévifrance">Prévifrance</option>
+                        <option value="Mutuelle Verte">Mutuelle Verte</option>
+                        <option value="Macif">Macif</option>
+                        <option value="Sérénis">Sérénis</option>
+                        <option value="Harmonie Mutuelle">Harmonie Mutuelle</option>
+                        <option value="BNP Mutuelle">BNP Mutuelle</option>
+                        <option value="Mutuelle Bleue">Mutuelle Bleue</option>
+                        <option value="Miltis">Miltis</option>
+                        <option value="April">April</option>
+                        <option value="MGC">MGC</option>
+                        <option value="Cocoon">Cocoon</option>
+                        <option value="Swisslife">Swisslife</option>
+                        <option value="MGEN">MGEN</option>
+                        <option value="Selfassurance">Selfassurance</option>
+                        <option value="Mutualia">Mutualia</option>
+                        <option value="Maif">Maif</option>
+                        <option value="Adréa">Adréa</option>
+                        <option value="LMP">LMP</option>
+                        <option value="MAAF">MAAF</option>
+                        <option value="Otherwise">Otherwise</option>
+                        <option value="Avenir Mutuelle">Avenir Mutuelle</option>
+                        <option value="Mutualp">Mutualp</option>
+                        <option value="Matmut">Matmut</option>
+                        <option value="Pacifica">Pacifica</option>
+                        <option value="MNH">MNH</option>
+                        <option value="Klésia Mutuelle">Klésia Mutuelle</option>
+                        <option value="Gan">Gan</option>
+                        <option value="AllSecur">AllSecur</option>
+                        <option value="GMF">GMF</option>
+                        <option value="Gras Savoye">Gras Savoye</option>
+                        <option value="Smatis">Smatis</option>
+                        <option value="LMDE">LMDE</option>
+                        <option value="Apicil">Apicil</option>
+                        <option value="Mutuelle de Poitiers">Mutuelle de Poitiers</option>
+                        <option value="Pacifica Crédit Agricole">Pacifica Crédit Agricole</option>
+                        <option value="Humanis">Humanis</option>
+                        <option value="Alptis">Alptis</option>
+                        <option value="Allianz">Allianz</option>
+                        <option value="Generali">Generali</option>
+                        <option value="Crédit Mutuel">Crédit Mutuel</option>
+                        <option value="Aviva">Aviva</option>
+                        <option value="Groupama">Groupama</option>
+                        <option value="ECA Assurances">ECA Assurances</option>
+                        <option value="Uneo">Uneo</option>
+                    </select>
+                </div>
+            </section>
+            <style>
+                .form-group {
+                    margin-bottom: 20px;
+                }
+                #mutuelle-select {
+                    font-size: 16px; /* Taille de texte adaptée */
+                    width: 100%; /* Largeur pleine pour aligner avec les autres champs */
+                    padding: 8px; /* Ajout d'espace à l'intérieur pour un meilleur visuel */
+                }
+            </style>
+            <label for="expenses">Combien souhaitez-vous économiser chaque mois ?</label>
+            <input type="number" id="expenses" name="expenses" min="0" step="1" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="previous-price">Prix de la mutuelle précédente</label>
+            <input type="number" id="previous-price" name="previous-price" min="0" step="0.01" required class="form-control">
+        </div>
+        <div class="input-container">
+            <p>Choisissez une catégorie</p>
+            <select id="categoryValue" onchange="showCategory()" class="form-control">
+                <option value="">Sélectionnez votre catégorie</option>
+                <option value="Santé">Santé</option>
+                <option value="Prévoyance">Prévoyance</option>
+                <option value="Épargne">Épargne</option>
+                <option value="Retraite">Retraite</option>
+            </select>
+            <p id="categoryChosen" class="mt-2"></p>
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+            <button type="button" class="btn btn-primary" onclick="submitForm()">Voir les Offres <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </form>
+</section>
+<section class="results-section" style="margin-top: 60px;">
+    <div id="recommended-result" class="mt-4"></div>
+    <div id="comparison-table-container">
+        <table id="comparison-table" class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Mutuelle</th>
+                <th>Coût mensuel moyen</th>
+                <th>Économie mensuelle</th>
+                <th>Autres frais</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Les données des mutuelles seront insérées ici via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</section>
+</div>
+<footer class="text-center mt-5">
+    <p>© 2025 SpendSmart. Tous droits réservés.</p>
+</footer>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function showCategory() {
+        const categoryValue = document.getElementById('categoryValue').value;
+        document.getElementById('categoryChosen').innerText = `Catégorie choisie : ${categoryValue}`;
+    }
+    function submitForm() {
+        const expenses = document.getElementById('expenses').value;
+        const previousPrice = document.getElementById('previous-price').value;
+        const categoryValue = document.getElementById('categoryValue').value;
+        if (!selectedMutuelle) {
+            alert('Veuillez sélectionner une mutuelle.');
+            return;
+        }
+        if (!categoryValue) {
+            alert('Veuillez sélectionner une catégorie.');
+            return;
+        }
+        const mutuellesData = [
+            { mutuelle: 'Comparateur MutuelleSante', cost: 5.50, savings: previousPrice - 5.50, otherFees: 1 },
+            { mutuelle: 'Smeno', cost: 5.50, savings: previousPrice - 5.50, otherFees: 1 },
+            { mutuelle: 'Axa', cost: 7.32, savings: previousPrice - 7.32, otherFees: 2 },
+            { mutuelle: 'Malakoff Médéric', cost: 8.00, savings: previousPrice - 8.00, otherFees: 2 },
+            { mutuelle: 'MMA', cost: 9.00, savings: previousPrice - 9.00, otherFees: 3 },
+            { mutuelle: 'AG2R La Mondiale', cost: 9.48, savings: previousPrice - 9.48, otherFees: 3 },
+            { mutuelle: 'Heyme', cost: 9.90, savings: previousPrice - 9.90, otherFees: 3 },
+            { mutuelle: 'Solimut', cost: 9.90, savings: previousPrice - 9.90, otherFees: 3 },
+            { mutuelle: 'Prévifrance', cost: 11.88, savings: previousPrice - 11.88, otherFees: 4 },
+            { mutuelle: 'Mutuelle Verte', cost: 17.89, savings: previousPrice - 17.89, otherFees: 5 },
+            { mutuelle: 'Macif', cost: 18.00, savings: previousPrice - 18.00, otherFees: 5 },
+            { mutuelle: 'Sérénis', cost: 18.57, savings: previousPrice - 18.57, otherFees: 5 },
+            { mutuelle: 'Harmonie Mutuelle', cost: 18.60, savings: previousPrice - 18.60, otherFees: 5 },
+            { mutuelle: 'BNP Mutuelle', cost: 19.00, savings: previousPrice - 19.00, otherFees: 5 },
+            { mutuelle: 'Mutuelle Bleue', cost: 19.00, savings: previousPrice - 19.00, otherFees: 5 },
+            { mutuelle: 'Miltis', cost: 19.90, savings: previousPrice - 19.90, otherFees: 5 },
+            { mutuelle: 'April', cost: 20.00, savings: previousPrice - 20.00, otherFees: 5 },
+            { mutuelle: 'MGC', cost: 20.36, savings: previousPrice - 20.36, otherFees: 5 },
+            { mutuelle: 'Cocoon', cost: 21.00, savings: previousPrice - 21.00, otherFees: 5 },
+            { mutuelle: 'Swisslife', cost: 21.80, savings: previousPrice - 21.80, otherFees: 6 },
+            { mutuelle: 'MGEN', cost: 22.00, savings: previousPrice - 22.00, otherFees: 6 },
+            { mutuelle: 'Selfassurance', cost: 24.00, savings: previousPrice - 24.00, otherFees: 6 },
+            { mutuelle: 'Mutualia', cost: 24.02, savings: previousPrice - 24.02, otherFees: 6 },
+            { mutuelle: 'Maif', cost: 25.75, savings: previousPrice - 25.75, otherFees: 6 },
+            { mutuelle: 'Adréa', cost: 25.97, savings: previousPrice - 25.97, otherFees: 6 },
+            { mutuelle: 'LMP', cost: 26.90, savings: previousPrice - 26.90, otherFees: 6 },
+            { mutuelle: 'MAAF', cost: 28.71, savings: previousPrice - 28.71, otherFees: 7 },
+            { mutuelle: 'Otherwise', cost: 32.80, savings: previousPrice - 32.80, otherFees: 7 },
+            { mutuelle: 'Avenir Mutuelle', cost: 32.92, savings: previousPrice - 32.92, otherFees: 7 },
+            { mutuelle: 'Mutualp', cost: 33.25, savings: previousPrice - 33.25, otherFees: 7 },
+            { mutuelle: 'Matmut', cost: 33.87, savings: previousPrice - 33.87, otherFees: 7 },
+            { mutuelle: 'Pacifica', cost: 35.00, savings: previousPrice - 35.00, otherFees: 7 },
+            { mutuelle: 'MNH', cost: 35.12, savings: previousPrice - 35.12, otherFees: 7 },
+            { mutuelle: 'Klésia Mutuelle', cost: 36.11, savings: previousPrice - 36.11, otherFees: 7 },
+            { mutuelle: 'Gan', cost: 46.00, savings: previousPrice - 46.00, otherFees: 8 },
+            { mutuelle: 'AllSecur', cost: 46.22, savings: previousPrice - 46.22, otherFees: 8 },
+            { mutuelle: 'GMF', cost: 51.81, savings: previousPrice - 51.81, otherFees: 9 },
+            { mutuelle: 'Gras Savoye', cost: 52.25, savings: previousPrice - 52.25, otherFees: 9 },
+            { mutuelle: 'Smatis', cost: 52.73, savings: previousPrice - 52.73, otherFees: 9 },
+            { mutuelle: 'LMDE', cost: 53.13, savings: previousPrice - 53.13, otherFees: 9 },
+            { mutuelle: 'Apicil', cost: 54.09, savings: previousPrice - 54.09, otherFees: 9 },
+            { mutuelle: 'Mutuelle de Poitiers', cost: 54.63, savings: previousPrice - 54.63, otherFees: 9 },
+            { mutuelle: 'Pacifica Crédit Agricole', cost: 55.27, savings: previousPrice - 55.27, otherFees: 10 },
+            { mutuelle: 'Humanis', cost: 57.15, savings: previousPrice - 57.15, otherFees: 10 },
+            { mutuelle: 'Alptis', cost: 60.42, savings: previousPrice - 60.42, otherFees: 10 },
+            { mutuelle: 'Allianz', cost: 66.61, savings: previousPrice - 66.61, otherFees: 10 },
+            { mutuelle: 'Generali', cost: 68.32, savings: previousPrice - 68.32, otherFees: 10 },
+            { mutuelle: 'Crédit Mutuel', cost: 68.45, savings: previousPrice - 68.45, otherFees: 11 },
+            { mutuelle: 'Aviva', cost: 71.33, savings: previousPrice - 71.33, otherFees: 11 },
+            { mutuelle: 'Groupama', cost: 78.67, savings: previousPrice - 78.67, otherFees: 12 },
+            { mutuelle: 'ECA Assurances', cost: 82.42, savings: previousPrice - 82.42, otherFees: 12 },
+            { mutuelle: 'Uneo', cost: 85.15, savings: previousPrice - 85.15, otherFees: 12 }
+        ];
+        const selectedMutuelleData = mutuellesData.find(mutuelle => mutuelle.mutuelle === selectedMutuelle);
+        document.getElementById('recommended-result').innerHTML = `
+                <h3>Offre recommandée</h3>
+                <p>Mutuelle : ${selectedMutuelle}</p>
+                <p>Coût mensuel moyen : ${selectedMutuelleData.cost} €</p>
+                <p>Économie mensuelle : ${selectedMutuelleData.savings} €</p>
+                <p>Autres frais : ${selectedMutuelleData.otherFees} €</p>
+            `;
+        // Populate the comparison table
+        const tableBody = document.getElementById('comparison-table').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = ''; // Clear previous rows
+        mutuellesData.forEach(mutuelle => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                    <td>${mutuelle.mutuelle}</td>
+                    <td>${mutuelle.cost} €</td>
+                    <td>${mutuelle.savings} €</td>
+                    <td>${mutuelle.otherFees} €</td>
+                `;
+            tableBody.appendChild(row);
+        });
+    }
+</script>
+</body>
+</html>
