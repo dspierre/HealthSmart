@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+        <html lang="fr">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Suggestions Culinaires et Notation</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9fafc;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        select, button {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #56c29c;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            text-align: left;
+            font-size: 16px;
+            margin: 10px 0;
+            border-bottom: 1px solid #ececec;
+            padding-bottom: 10px;
+        }
+        #recipe-details {
+            display: none;
+            margin-top: 20px;
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        #pagination-controls button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Suggestions Culinaires et Notation</h1>
+    <form id="allergy-form">
+        <label for="allergies">Types d'allergies ou intolérances :</label>
+        <select id="allergies" multiple>
+            <option value="pollens">🌾 Pollens</option>
+            <option value="gluten">🍞 Gluten</option>
+            <option value="lactose">🥛 Lactose</option>
+            <option value="arachides">🥜 Arachides</option>
+            <option value="fruits_de_mer">🦐 Fruits de mer</option>
+            <option value="arachide">🥜 Arachide</option>
+            <option value="celeri">🥕 Céleri</option>
+            <option value="crustaces">🦀 Crustacés</option>
+            <option value="cereales_gluten">🌾 Céréales contenant du Gluten</option>
+            <option value="fruits_a_coque">🌰 Fruits à coque</option>
+            <option value="lait">🥛 Lait</option>
+            <option value="lupin">🌿 Lupin</option>
+            <option value="oeuf">🍳 Œuf</option>
+            <option value="mollusques">🐚 Mollusques</option>
+            <option value="moutarde">🌿 Moutarde</option>
+            <option value="sesame">🥒 Sésame</option>
+            <option value="soja">🥦 Soja</option>
+            <option value="sulfites">🍇 Sulfites</option>
+        </select>
+        <button type="button" id="search-button">Rechercher</button>
+    </form>
+    <div id="recipe-results">
+        <ul id="recipe-list"></ul> <!-- Liste des recettes -->
+    </div>
+    <div id="recipe-details">
+        <h3 id="recipe-title"></h3>
+        <p id="recipe-ingredients"></p>
+        <p id="recipe-instructions"></p>
+        <button id="close-details">Fermer</button>
+    </div>
+    <div id="pagination-controls"></div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchButton = document.getElementById("search-button");
+        const recipeList = document.getElementById("recipe-list");
+        const recipeDetails = document.getElementById("recipe-details");
+        const paginationControls = document.getElementById("pagination-controls");
+        const allergyRecipes = {
+            gluten: [
+                {
+                    name: "Soufflé au fromage sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "50g" },
+                        { item: "Beurre sans lactose", quantity: "50g" },
+                        { item: "Lait sans lactose", quantity: "250ml" },
+                        { item: "Fromage râpé", quantity: "100g" },
+                        { item: "Œufs", quantity: "4" }
+                    ],
+                    instructions: "Préparez une béchamel avec la farine, le beurre et le lait. Incorporez le fromage et les jaunes d'œufs. Montez les blancs en neige et incorporez-les délicatement. Faites cuire à 180°C pendant 25 minutes."
+                },
+                {
+                    name: "Pizza sans gluten",
+                    ingredients: [
+                        { item: "Farine sans gluten", quantity: "300g" },
+                        { item: "Eau tiède", quantity: "200ml" },
+                        { item: "Levure sèche", quantity: "1 sachet" },
+                        { item: "Huile d'olive", quantity: "2 cuillères à soupe" },
+                        { item: "Garnitures au choix", quantity: "Selon votre goût" }
+                    ],
+                    instructions: "Préparez la pâte avec les ingrédients. Laissez lever 1 heure. Étalez la pâte, ajoutez les garnitures, et faites cuire au four à 200°C pendant 15-20 minutes."
+                },
+                {
+                    name: "Quiche sans gluten aux légumes",
+                    ingredients: [
+                        { item: "Farine sans gluten", quantity: "200g" },
+                        { item: "Beurre sans lactose", quantity: "100g" },
+                        { item: "Eau froide", quantity: "2 cuillères à soupe" },
+                        { item: "Légumes variés", quantity: "300g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Lait sans lactose", quantity: "150ml" }
+                    ],
+                    instructions: "Préparez la pâte et foncez un moule à tarte. Ajoutez les légumes pré-cuits. Mélangez les œufs avec le lait, versez sur les légumes, et faites cuire à 180°C pendant 40 minutes."
+                },
+                {
+                    name: "Biscuits à la cannelle sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Beurre sans lactose", quantity: "100g" },
+                        { item: "Sucre", quantity: "80g" },
+                        { item: "Œufs", quantity: "1" },
+                        { item: "Cannelle", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Mélangez les ingrédients pour former une pâte. Étalez, découpez des formes et faites cuire au four à 180°C pendant 10-12 minutes."
+                },
+                {
+                    name: "Fondant au chocolat sans gluten",
+                    ingredients: [
+                        { item: "Chocolat noir", quantity: "200g" },
+                        { item: "Beurre sans lactose", quantity: "150g" },
+                        { item: "Sucre", quantity: "150g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Farine de riz", quantity: "50g" }
+                    ],
+                    instructions: "Faites fondre le chocolat et le beurre. Incorporez le sucre, les œufs et la farine. Versez dans un moule et faites cuire à 180°C pendant 15 minutes."
+                },
+                {
+                    name: "Gaufres sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Lait sans lactose", quantity: "250ml" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Sucre", quantity: "2 cuillères à soupe" },
+                        { item: "Beurre sans lactose fondu", quantity: "50g" }
+                    ],
+                    instructions: "Mélangez les ingrédients jusqu'à obtenir une pâte lisse. Faites cuire dans un gaufrier préchauffé jusqu'à ce qu'elles soient dorées."
+                },
+                {
+                    name: "Gâteau au chocolat sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "150g" },
+                        { item: "Cacao en poudre", quantity: "50g" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Beurre sans lactose", quantity: "100g" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients. Versez dans un moule. Faites cuire au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Crêpes sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Lait sans lactose", quantity: "500ml" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Sucre", quantity: "2 cuillères à soupe" },
+                        { item: "Huile", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Mélangez les ingrédients. Faites cuire la pâte dans une poêle chaude, en formant des crêpes fines."
+                },
+                {
+                    name: "Pain à la banane sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Bananes mûres", quantity: "2 grandes" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Levure chimique", quantity: "1 sachet" }
+                    ],
+                    instructions: "Écrasez les bananes, ajoutez les autres ingrédients. Versez dans un moule et faites cuire au four à 180°C pendant 40 minutes."
+                },
+                {
+                    name: "Muffins aux myrtilles sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Myrtilles", quantity: "150g" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Levure chimique", quantity: "1 sachet" }
+                    ],
+                    instructions: "Mélangez les ingrédients. Répartissez dans des moules à muffins. Faites cuire au four à 180°C pendant 20 minutes."
+                },
+                {
+                    name: "Galettes de pommes de terre sans gluten",
+                    ingredients: [
+                        { item: "Pommes de terre râpées", quantity: "300g" },
+                        { item: "Farine de riz", quantity: "50g" },
+                        { item: "Œufs", quantity: "1" },
+                        { item: "Sel", quantity: "1 cuillère à café" },
+                        { item: "Huile", quantity: "2 cuillères à soupe" }
+                    ],
+                    instructions: "Mélangez les ingrédients. Faites cuire des petites galettes dans une poêle chaude avec un peu d'huile."
+                },
+                {
+                    name: "Pancakes sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Lait végétal", quantity: "250ml" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Sucre", quantity: "2 cuillères à soupe" },
+                        { item: "Levure chimique", quantity: "1 sachet" }
+                    ],
+                    instructions: "Mélangez les ingrédients jusqu'à obtenir une pâte homogène. Faites cuire des petites portions dans une poêle chaude légèrement huilée."
+                },
+                {
+                    name: "Lasagnes sans gluten aux légumes",
+                    ingredients: [
+                        { item: "Pâtes à lasagnes sans gluten", quantity: "200g" },
+                        { item: "Légumes variés", quantity: "400g" },
+                        { item: "Sauce tomate", quantity: "300ml" },
+                        { item: "Fromage râpé sans lactose", quantity: "100g" },
+                        { item: "Herbes de Provence", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Alternez les couches de pâtes, légumes, et sauce tomate. Terminez avec du fromage râpé et faites cuire au four à 180°C pendant 40 minutes."
+                },
+                {
+                    name: "Tarte aux fruits rouges sans gluten",
+                    ingredients: [
+                        { item: "Farine sans gluten", quantity: "200g" },
+                        { item: "Beurre sans lactose", quantity: "100g" },
+                        { item: "Sucre", quantity: "80g" },
+                        { item: "Œufs", quantity: "1" },
+                        { item: "Fruits rouges", quantity: "300g" }
+                    ],
+                    instructions: "Préparez la pâte et foncez un moule. Disposez les fruits rouges sur la pâte et saupoudrez de sucre. Faites cuire au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Soupe de carottes au lait de coco sans gluten",
+                    ingredients: [
+                        {item: "Carottes", quantity: "500g"},
+                        {item: "Lait de coco", quantity: "200ml"},
+                        {item: "Oignons", quantity: "1"},
+                        {item: "Gingembre frais", quantity: "1 cuillère à soupe"},
+                        {item: "Huile d'olive", quantity: "1 cuillère à soupe"}
+                    ],
+                    instructions: "Faites revenir les oignons et le gingembre dans l'huile. Ajoutez les carottes et de l'eau pour couvrir. Faites cuire jusqu'à ce que les carottes soient tendres, mixez avec le lait de coco."
+                }
+            ],
+            lactose: [
+                {
+                    name: "Smoothie aux fruits rouges et lait d'amande",
+                    ingredients: [
+                        { item: "Fruits rouges", quantity: "200g" },
+                        { item: "Lait d'amande", quantity: "300ml" },
+                        { item: "Banane", quantity: "1" },
+                        { item: "Miel", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients dans un mixeur jusqu'à obtenir une consistance lisse. Servez frais."
+                },
+                {
+                    name: "Quiche aux légumes avec crème de soja",
+                    ingredients: [
+                        { item: "Pâte brisée sans lactose", quantity: "1" },
+                        { item: "Légumes variés", quantity: "300g" },
+                        { item: "Crème de soja", quantity: "150ml" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Herbes fraîches", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Disposez les légumes sur la pâte. Mélangez les œufs avec la crème de soja et les herbes. Versez sur les légumes et faites cuire au four à 180°C pendant 40 minutes."
+                },
+                {
+                    name: "Porridge au lait de coco et fruits frais",
+                    ingredients: [
+                        { item: "Flocons d'avoine sans gluten", quantity: "200g" },
+                        { item: "Lait de coco", quantity: "300ml" },
+                        { item: "Fruits frais coupés", quantity: "150g" },
+                        { item: "Graines de chia", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Faites chauffer les flocons d'avoine avec le lait de coco jusqu'à épaississement. Ajoutez les fruits et les graines de chia avant de servir."
+                },
+                {
+                    name: "Curry de légumes au lait de coco",
+                    ingredients: [
+                        { item: "Légumes variés", quantity: "500g" },
+                        { item: "Lait de coco", quantity: "300ml" },
+                        { item: "Pâte de curry", quantity: "2 cuillères à soupe" },
+                        { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Faites chauffer l'huile, ajoutez la pâte de curry et mélangez. Ajoutez les légumes et le lait de coco. Laissez mijoter pendant 20 minutes."
+                },
+                {
+                    name: "Cake au citron sans lactose",
+                    ingredients: [
+                        { item: "Farine", quantity: "200g" },
+                        { item: "Sucre", quantity: "150g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Jus de citron", quantity: "100ml" },
+                        { item: "Huile végétale", quantity: "100ml" }
+                    ],
+                    instructions: "Mélangez les ingrédients. Versez dans un moule et faites cuire au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Muffins banane et chocolat sans lactose",
+                    ingredients: [
+                        { item: "Farine", quantity: "200g" },
+                        { item: "Banane mûre", quantity: "2" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Pépites de chocolat", quantity: "50g" },
+                        { item: "Lait végétal", quantity: "100ml" }
+                    ],
+                    instructions: "Écrasez les bananes, mélangez avec les autres ingrédients. Répartissez dans des moules à muffins et faites cuire au four à 180°C pendant 20 minutes."
+                },
+                {
+                    name: "Soupe de courgettes au lait de coco",
+                    ingredients: [
+                        { item: "Courgettes", quantity: "500g" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Oignon", quantity: "1" },
+                        { item: "Ail", quantity: "1 gousse" },
+                        { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Faites revenir l'oignon et l'ail dans l'huile. Ajoutez les courgettes et de l'eau pour couvrir. Faites cuire, puis mixez avec le lait de coco."
+                },
+                {
+                    name: "Brownies sans lactose",
+                    ingredients: [
+                        { item: "Farine", quantity: "100g" },
+                        { item: "Chocolat noir", quantity: "200g" },
+                        { item: "Sucre", quantity: "150g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Huile végétale", quantity: "100ml" }
+                    ],
+                    instructions: "Faites fondre le chocolat, mélangez avec les autres ingrédients. Versez dans un moule et faites cuire au four à 180°C pendant 25 minutes."
+                },
+                {
+                    name: "Curry de pois chiches au lait de coco",
+                    ingredients: [
+                        { item: "Pois chiches cuits", quantity: "400g" },
+                        { item: "Lait de coco", quantity: "300ml" },
+                        { item: "Tomates", quantity: "200g" },
+                        { item: "Épices pour curry", quantity: "1 cuillère à soupe" },
+                        { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Faites chauffer l'huile, ajoutez les épices, les pois chiches et les tomates. Versez le lait de coco et laissez mijoter 15 minutes."
+                },
+                {
+                    name: "Pain perdu au lait d'amande",
+                    ingredients: [
+                        { item: "Tranches de pain", quantity: "4" },
+                        { item: "Lait d'amande", quantity: "200ml" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Sucre", quantity: "2 cuillères à soupe" },
+                        { item: "Cannelle", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Trempez le pain dans le mélange lait, œufs, sucre et cannelle. Faites cuire dans une poêle chaude jusqu'à ce que le pain soit doré."
+                },
+                {
+                    name: "Risotto aux champignons sans lactose",
+                    ingredients: [
+                        { item: "Riz Arborio", quantity: "200g" },
+                        { item: "Champignons", quantity: "300g" },
+                        { item: "Bouillon de légumes", quantity: "500ml" },
+                        { item: "Oignon", quantity: "1" },
+                        { item: "Huile d'olive", quantity: "2 cuillères à soupe" }
+                    ],
+                    instructions: "Faites revenir l'oignon dans l'huile, ajoutez les champignons, puis le riz. Versez le bouillon progressivement en remuant jusqu'à cuisson complète."
+                },
+                {
+                    name: "Flan au lait de soja",
+                    ingredients: [
+                        { item: "Lait de soja", quantity: "500ml" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Extrait de vanille", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Mélangez les ingrédients, versez dans des ramequins et faites cuire au bain-marie au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Salade de lentilles au lait de coco",
+                    ingredients: [
+                        { item: "Lentilles cuites", quantity: "400g" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Carottes râpées", quantity: "100g" },
+                        { item: "Coriandre fraîche", quantity: "1 cuillère à soupe" },
+                        { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients dans un bol. Servez frais."
+                },
+                {
+                    name: "Clafoutis aux fruits sans lactose",
+                    ingredients: [
+                        { item: "Fruits de saison", quantity: "300g" },
+                        { item: "Farine", quantity: "100g" },
+                        { item: "Lait d'amande", quantity: "200ml" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Sucre", quantity: "80g" }
+                    ],
+                    instructions: "Disposez les fruits dans un plat. Mélangez les autres ingrédients, versez sur les fruits, et faites cuire au four à 180°C pendant 35 minutes."
+                }
+            ],
+            const: Arachides = [
+                {
+                    name: "Poulet sauce arachide",
+                    ingredients: [
+                        { item: "Poulet", quantity: "500g" },
+                        { item: "Pâte d'arachide", quantity: "3 cuillères à soupe" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Tomates", quantity: "2" },
+                        { item: "Oignon", quantity: "1" },
+                        { item: "Ail", quantity: "2 gousses" },
+                        { item: "Gingembre", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Faites revenir l'oignon, l'ail et le gingembre. Ajoutez les tomates, la pâte d'arachide et le lait de coco. Laissez mijoter, puis ajoutez le poulet. Cuisez jusqu'à tendreté."
+                },
+                {
+                    name: "Nouilles sautées aux arachides",
+                    ingredients: [
+                        { item: "Nouilles", quantity: "200g" },
+                        { item: "Beurre d'arachide", quantity: "2 cuillères à soupe" },
+                        { item: "Sauce soja", quantity: "2 cuillères à soupe" },
+                        { item: "Ail", quantity: "1 gousse" },
+                        { item: "Légumes sautés", quantity: "Au choix" }
+                    ],
+                    instructions: "Mélangez le beurre d'arachide avec la sauce soja. Faites sauter les légumes et les nouilles, puis ajoutez la sauce."
+                },
+                {
+                    name: "Biscuits au beurre d'arachide",
+                    ingredients: [
+                        { item: "Beurre d'arachide", quantity: "200g" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Œuf", quantity: "1" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients, formez des boules, aplatissez-les et cuisez au four à 180°C pendant 10 minutes."
+                },
+                {
+                    name: "Salade croquante aux arachides",
+                    ingredients: [
+                        { item: "Chou rouge", quantity: "100g" },
+                        { item: "Carottes râpées", quantity: "100g" },
+                        { item: "Arachides grillées", quantity: "50g" },
+                        { item: "Vinaigrette au citron", quantity: "Au goût" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients et servez frais."
+                },
+                {
+                    name: "Sauce aux arachides",
+                    ingredients: [
+                        { item: "Beurre d'arachide", quantity: "3 cuillères à soupe" },
+                        { item: "Sauce soja", quantity: "1 cuillère à soupe" },
+                        { item: "Miel", quantity: "1 cuillère à café" },
+                        { item: "Eau", quantity: "50ml" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients jusqu'à obtenir une consistance lisse."
+                },
+                {
+                    name: "Curry de légumes aux arachides",
+                    ingredients: [
+                        { item: "Légumes variés", quantity: "500g" },
+                        { item: "Pâte d'arachide", quantity: "2 cuillères à soupe" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Épices au choix", quantity: "Au goût" }
+                    ],
+                    instructions: "Faites mijoter les légumes avec la pâte d'arachide, le lait de coco et les épices."
+                },
+                {
+                    name: "Barres énergétiques aux arachides",
+                    ingredients: [
+                        { item: "Flocons d'avoine", quantity: "200g" },
+                        { item: "Beurre d'arachide", quantity: "100g" },
+                        { item: "Miel", quantity: "50g" },
+                        { item: "Fruits secs", quantity: "Au choix" }
+                    ],
+                    instructions: "Mélangez les ingrédients, tassez dans un moule et laissez refroidir."
+                },
+                {
+                    name: "Riz sauté aux arachides",
+                    ingredients: [
+                        { item: "Riz cuit", quantity: "200g" },
+                        { item: "Arachides grillées", quantity: "50g" },
+                        { item: "Légumes sautés", quantity: "Au choix" },
+                        { item: "Sauce soja", quantity: "Au goût" }
+                    ],
+                    instructions: "Faites sauter le riz avec les légumes et les arachides, puis ajoutez la sauce soja."
+                },
+                {
+                    name: "Gâteau aux arachides",
+                    ingredients: [
+                        { item: "Farine", quantity: "200g" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Beurre d'arachide", quantity: "100g" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Lait", quantity: "100ml" }
+                    ],
+                    instructions: "Mélangez les ingrédients, versez dans un moule et cuisez au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Smoothie banane-arachide",
+                    ingredients: [
+                        { item: "Banane", quantity: "1" },
+                        { item: "Lait", quantity: "200ml" },
+                        { item: "Beurre d'arachide", quantity: "1 cuillère à soupe" },
+                        { item: "Miel", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Mixez tous les ingrédients jusqu'à obtenir une texture lisse."
+                }
+            ],};
+// Pour afficher ou manipuler ces recettes, vous pouvez parcourir le tableau "Arachides".
+        // Fonction pour afficher les recettes
+        function displayRecipes(recipes) {
+            recipeList.innerHTML = recipes.map(recipe => `
+            <li>
+                <b>${recipe.name}</b>
+                <button class="view-recipe" data-name="${recipe.name}">Voir Détails</button>
+            </li>
+        `).join("");
+            document.querySelectorAll(".view-recipe").forEach(button => {
+                button.addEventListener("click", () => {
+                    const recipeName = button.dataset.name;
+                    const recipe = recipes.find(r => r.name === recipeName);
+                    showRecipeDetails(recipe);
+                });
+            });
+        }
+        // Fonction pour afficher les détails d'une recette
+        function showRecipeDetails(recipe) {
+            recipeDetails.innerHTML = `
+            <h2>${recipe.name}</h2>
+            <p><b>Ingrédients :</b> ${recipe.ingredients.map(ingredient => `${ingredient.item} (${ingredient.quantity})`).join(", ")}</p>
+            <p><b>Instructions :</b> ${recipe.instructions}</p>
+            <button id="close-details">Fermer</button>
+        `;
+            recipeDetails.style.display = "block";
+            document.getElementById("close-details").addEventListener("click", () => {
+                recipeDetails.style.display = "none";
+            });
+        }
+        // Gestion de la recherche
+        searchButton.addEventListener("click", () => {
+            const selectedAllergies = Array.from(document.getElementById("allergies").selectedOptions).map(option => option.value);
+            const recipesToShow = selectedAllergies.flatMap(allergy => allergyRecipes[allergy] || []);
+            displayRecipes(recipesToShow);
+        });
+    });
+</script>
+</body>
+</html>

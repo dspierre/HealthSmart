@@ -106,6 +106,26 @@
     .day h3.dark-mode {
       background-color: #333;
     }
+    .hour {
+      position: relative; /* Pour positionner les événements */
+      height: 50px; /* Ajustez la hauteur pour plus de lisibilité */
+      border-bottom: 1px solid #ddd;
+    }
+    .event {
+      position: absolute;
+      background: #f4f4f4;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 5px;
+      font-size: 12px;
+      z-index: 10;
+    }
+    .day {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 5px;
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -137,7 +157,6 @@
   const searchBar = document.getElementById('search-bar');
   const exportButton = document.getElementById('export-button');
   const eventList = document.getElementById('event-list');
-
   // Variables globales
   let currentWeekStart = new Date();
   currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay()); // Début de la semaine (dimanche par défaut)
@@ -252,6 +271,52 @@
     renderWeekView(currentWeekStart);
     updateEventList();
   }
+  // Fonction pour modifier un événement existant
+  function editEvent(day, hour) {
+    // Trouve l'événement correspondant
+    const event = events.find(e => e.date === day && e.hour === hour);
+    if (event) {
+      // Demande un nouveau nom pour l'événement
+      const newName = prompt('Modifier le nom de l\'événement :', event.name);
+      if (newName) {
+        event.name = newName; // Met à jour le nom
+        saveEvents(); // Sauvegarde dans localStorage
+        renderWeekView(currentWeekStart); // Rafraîchit la vue
+        updateEventList(); // Met à jour la liste des événements
+        showNotification('Événement modifié.');
+      }
+    } else {
+      showNotification('Aucun événement trouvé pour modifier.');
+    }
+  }
+
+  // Fonction pour supprimer un événement existant
+  function deleteEvent(day, hour) {
+    // Filtre les événements pour exclure celui à supprimer
+    events = events.filter(e => !(e.date === day && e.hour === hour));
+    saveEvents(); // Sauvegarde dans localStorage
+    renderWeekView(currentWeekStart); // Rafraîchit la vue
+    updateEventList(); // Met à jour la liste des événements
+    showNotification('Événement supprimé.');
+  }
+
+  // Exemple d'utilisation dans le DOM
+  // Vous pouvez appeler ces fonctions lors d'un clic sur un événement dans le calendrier ou dans la liste
+  document.body.addEventListener('click', (e) => {
+    if (e.target.classList.contains('edit-button')) {
+      const day = e.target.dataset.day; // Obtient le jour depuis les attributs de l'élément
+      const hour = e.target.dataset.hour; // Obtient l'heure
+      editEvent(day, hour);
+    }
+    if (e.target.classList.contains('delete-button')) {
+      const day = e.target.dataset.day;
+      const hour = e.target.dataset.hour;
+      const confirmDelete = confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');
+      if (confirmDelete) {
+        deleteEvent(day, hour);
+      }
+    }
+  });
   // Met à jour la liste des événements
   function updateEventList() {
     eventList.innerHTML = '<h3>Liste des événements :</h3>';

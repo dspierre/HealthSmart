@@ -56,25 +56,10 @@
         .list {
             margin-top: 20px;
         }
-        .note-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #eef6f5;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .delete-btn {
-            background-color: #f25f5c;
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .delete-btn:hover {
-            background-color: #d14949;
+        img {
+            display: block;
+            margin: 20px auto;
+            width: 35%; /* Réduction de la taille de l'image à 75 % */
         }
     </style>
 </head>
@@ -84,15 +69,8 @@
     <p>Découvrez une citation inspirante chaque jour :</p>
     <div class="quote" id="dailyQuote"></div>
     <div class="author" id="quoteAuthor"></div>
-    <textarea id="positiveNote" placeholder="Écrivez ici vos pensées..."></textarea>
-    <button onclick="saveNote()">Sauvegarder</button>
-    <label for="filterDate">Rechercher par date :</label>
-    <input type="date" id="filterDate">
-    <button onclick="filterByDate()">Rechercher</button>
-    <div class="list" id="notesList"></div>
-    <div id="pointsContainer">
-        <h3 id="userPoints">Points: 0</h3>
-    </div>
+</div>
+<img src="beautiful sunset.png" alt="Bibliothèque Médicale">
 </div>
 <script>
     // Array of inspirational quotes
@@ -215,6 +193,32 @@
         { text: "Le plus grand secret pour réussir, c'est d'avoir confiance en soi.", author: "Ralph Waldo Emerson" },
         { text: "Le bonheur n'est pas quelque chose de prêt à l'emploi. Cela vient de vos propres actions.", author: "Dalai Lama" },
         { text: "N'attendez pas. Le moment parfait n'existe pas.", author: "Napoleon Hill" },
+        {text: "Rêvez grand, commencez petit, mais surtout, commencez." ,author:-" Simon Sinek"},
+        {text :"La persévérance, c'est ne jamais abandonner malgré les obstacles." ,author: "Winston Churchill"},
+        {text :"Les échecs sont simplement l'opportunité de recommencer, mais avec plus d'expérience.",author: "Henry Ford"},
+        {text :" La confiance en soi est le premier secret du succès." , author: "Ralph Waldo Emerson"},
+        {text :"Changez vos pensées et vous changerez votre monde." , author:"Norman Vincent Peale"},
+        {text :"Votre avenir est créé par ce que vous faites aujourd'hui, pas demain.", author:"Robert Kiyosaki"},
+        {text :"Le succès n'est pas la clé du bonheur. Le bonheur est la clé du succès." , author: "Albert Schweitzer "},
+        {text :"Faites toujours de votre mieux. Ce que vous plantez aujourd'hui, vous le récolterez demain.", author:"Og Mandino "},
+        {text :"Ne jugez pas chaque jour par la récolte que vous faites, mais par les graines que vous plantez.",author:"Robert Louis Stevenson"},
+        {text :"La meilleure façon de prévoir l'avenir est de le créer." , author: "Peter Drucker"},
+        {text :"Ne sous-estimez jamais la puissance des rêves et de l'esprit humain.",author: "Wilma Rudolph "},
+        {text :"La discipline est le pont entre les objectifs et les réalisations.",author : "Ralph Waldo Emerson"},
+        {text :"Allez-y doucement, mais ne vous arrêtez jamais.", author: "Confucius"},
+        {text :"Vous êtes plus fort que vous ne le croyez, plus courageux que vous ne le pensez.", author:"A.A. Milne" },
+        {text :"Les limites n'existent que dans notre esprit.",author:" Napoleon Hill"},
+        {text :"Ce que vous faites régulièrement devient votre réalité.",author:"John Maxwell"},
+        {text :"La vie commence là où finit votre zone de confort.",author:" Neale Donald Walsch"},
+        {text :"N'abandonnez jamais, car c'est souvent le dernier coup de clé qui ouvre la porte.", author:"Paulo Coelho"},
+        {text :"Les rêves ne sont pas ce que nous voyons en dormant, mais ce qui nous empêche de dormir.", author:"A.P.J. Abdul Kalam"},
+        {text :"Être occupé ne signifie pas être productif. Concentrez-vous sur ce qui compte vraiment.",author:"Tim Ferriss"},
+        {text : "La beauté de la vie réside dans l'aventure et la découverte.",author:"Eleanor Roosevelt"},
+        {text :"La patience est amère, mais ses fruits sont doux." ,author: "Jean-Jacques Rousseau"},
+        {text :"Faites du temps votre allié, pas votre ennemi.", author:"Auteur inconnu"},
+        {text :"L'énergie suit l'intention.", author:"James Redfield"},
+        {text :"Un objectif sans plan n'est qu'un souhait." ,author:"Antoine de Saint-Exupéry"},
+        {text :"La simplicité est la clé de l'élégance et de la productivité.",author:"Steve Jobs"},
     ];
     // Display the daily inspirational quote
     const displayDailyQuote = () => {

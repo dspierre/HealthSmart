@@ -1,38 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>EventSmart</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="SpendSmart - Transformez vos finances, transformez votre vie. Découvrez notre solution de gestion complète pour les bons gestionnaires de budgets.">
     <meta name="keywords" content="gestion financière, budget, économies, retraite, impôts, IA, immobilier">
-    <title></title>
     <style>
-        /* Section Tarifs */
-        #pricing {
-            background-color: #f9f9f9;
-            padding: 50px 20px;
-            text-align: center;
-        }
-        .pricing-grid {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .card {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 250px;
-        }
-        .card:hover {
-            background-color: #f0f8ff;
-            transform: scale(1.05);
-            transition: all 0.3s ease;
-        }
-
         /* Section Contact */
         #contact {
             background-color: #ffffff;
@@ -90,7 +64,7 @@
         }
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #70e0b6, #ffffff); /* Dégradé vert clair */
+            background: linear-gradient(135deg, #FFDEAD, #ffffff); /* Dégradé vert clair */
             margin: 0;
             padding: 0;
             color: #333333;
@@ -123,7 +97,7 @@
         .dropdown-content {
             display: none;
             position: absolute;
-            top: 80%;
+            top: 100%;
             left: 0;
             background-color: #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -161,15 +135,12 @@
             width: 80px; /* Ajustez cette valeur pour réduire la taille du logo */
             height: auto;
         }
+        /* Section Hero */
         #hero {
-            background: url('pexels-shkrabaanthony-5215017.jpg') no-repeat center center/cover;
+            background: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?crop=entropy&cs=tinysrgb&w=1920&fit=max') no-repeat center center/cover;
             color: #fff;
-            text-align: center;
             padding: 100px 20px;
-        }
-        #hero .container {
-            max-width: 800px;
-            margin: 0 auto;
+            text-align: center;
         }
         #hero h1 {
             font-size: 3em;
@@ -251,7 +222,6 @@
                 font-size: 1em;
             }
         }
-
         button, .blue-button {
             padding: 10px 20px;
             border-radius: 5px;
@@ -284,7 +254,7 @@
 <body>
 <header>
     <nav>
-        <img src="HealthSmart logo (2).png" alt="Logo SpendSmart" class="logo">
+        <img src="spendsmart.png" alt="Logo SpendSmart" class="logo">
         <ul>
             <li><a href="#features">Fonctionnalités</a></li>
             <li><a href="#pricing">Tarifs</a></li>
@@ -292,14 +262,15 @@
             <li class="dropdown">
                 <a href="#outil" class="dropbtn">Outil</a>
                 <div class="dropdown-content">
-                    <a href="HealthSmart.html">HealthSmart Starter</a>
-                    <a href="HealthSmart_index_premium.html">HealthSmart Premium</a>
+                    <a href="EventSmart.html">Wedding Planner</a>
+                    <a href="Event_perso.html">Événement Personnel</a>
+                    <a href="Event_profesionnelle2.html">Événement Professionnel</a>
                 </div>
             </li>
             <li><a href="#contact">Contact</a></li>
         </ul>
         <div class="profile">
-            <a href="login.html" class="login"><span class="icon">🔑</span>Login</a>
+            <a href="login.html" class="login">🔑 Login</a>
             <a href="register3.html" class="inscription-button">Inscription</a>
         </div>
     </nav>
@@ -312,63 +283,48 @@
             <a href="#features" class="blue-button">En savoir plus</a>
         </div>
     </section>
-    <section id="features">
-        <h2>Fonctionnalités</h2>
+    <section id="event-professionnelle">
+        <h2>Événements Professionnels</h2>
         <div class="feature-grid">
-                <div class="feature">
-                    <span class="icon">🌟</span>
-                    <h3><a href="Bibliothèque_de_Santé.html">Bibliothèque de Santé</a></h3>
-                    <p>Conseils, Suivi des habitudes, Contacts médicaux</p>
-                </div>
-                <div class="feature">
-                    <span class="icon">🌿</span>
-                    <h3><a href="tracker_wellness.html">Tracker de Bien-être</a></h3>
-                    <p>Habitudes : sommeil, hydratation, activité, alimentation</p>
-                </div>
-                <div class="feature">
-                    <span class="icon">🗂️</span>
-                    <h3><a href="medical_agenda.html">Agenda médical</a></h3>
-                    <p>Rendez-vous, Historique, Notifications</p>
-                </div>
-                <div class="feature">
-                    <span class="icon">⚖️</span>
-                    <h3><a href="Calculateur_IMC.html">Calculateur IMC</a></h3>
-                    <p>Évaluation rapide et conseils adaptés</p>
-                </div>
-                <div class="feature">
-                    <span class="icon">💉</span>
-                    <h3><a href="Rappels_de_Vaccination.html">Rappels de Vaccination</a></h3>
-                    <p>Vaccins et recommandations locales</p>
-                </div>
-                <div class="feature">
-                    <span class="icon">🚑</span>
-                    <h3><a href="urgence.html">Urgence</a></h3>
-                    <p>Groupe sanguin, Informations vitales</p>
-                </div>
             <div class="feature">
-                <span class="icon">📋</span>
-                <h3><a href="Données de santé6.html">Données d’Assurance Santé</a></h3>
-                <p>Données santé, Ordonnance, Mutuelle, Carte vitale</p>
+                <span class="icon">📅</span>
+                <h3>Agenda et Gestion des Rendez-vous</h3>
+                <p>Planifiez les réunions et sessions avec des rappels intégrés pour un suivi efficace.</p>
             </div>
             <div class="feature">
-                <span class="icon">👨‍👩‍👧‍👦</span>
-                <h3><a href="Gestion_de_la_santé_familiale.html">Gestion de la santé familiale</a></h3>
-                <p>Rendez-vous, Vaccinations, Courbes de croissance</p>
+                <span class="icon">👥</span>
+                <h3>Suivi des Participants</h3>
+                <p>Inscription et suivi des participants, avec la possibilité d'envoyer des confirmations automatiques.</p>
             </div>
             <div class="feature">
-                <span class="icon">🔗</span>
-                <h3><a href="Santé_connectée.html">Santé connectée</a></h3>
-                <p>Suivi automatisé, Signes vitaux, Recommandations</p>
+                <span class="icon">🏢</span>
+                <h3>Réservation des Lieux</h3>
+                <p>Réservez des salles de conférence ou autres espaces adaptés pour votre événement.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">📂</span>
+                <h3>Documents et Contrats</h3>
+                <p>Stockez et gérez tous les documents nécessaires, comme les contrats et les factures.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">📞</span>
+                <h3>Coordination des Fournisseurs</h3>
+                <p>Gérez vos prestataires avec un suivi des communications et des paiements.</p>
             </div>
             <div class="feature">
                 <span class="icon">💼</span>
-                <h3><a href="Gestion_personnelle_et_financière.html">Gestion personnelle et financière</a></h3>
-                <p>Dépenses, Remboursements, Budget santé</p>
+                <h3>Gestion des Budgets</h3>
+                <p>Analysez et suivez les dépenses liées à l'événement pour optimiser votre budget.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">🔔</span>
+                <h3>Rappels Importants</h3>
+                <p>Recevez des alertes pour les deadlines cruciales et les étapes à venir.</p>
             </div>
             <div class="feature">
                 <span class="icon">📊</span>
-                <h3><a href="MediAI.html">Analyse et Prévisions de Santé Basées sur l'IA</a></h3>
-                <p>Prédictions, Optimisation, Soins personnalisés</p>
+                <h3>Rapports et Statistiques</h3>
+                <p>Obtenez des rapports détaillés sur la participation, les dépenses et les retours.</p>
             </div>
         </div>
     </section>
@@ -376,20 +332,11 @@
         <h2>Tarifs</h2>
         <div class="pricing-grid">
             <div class="pricing-plan">
-                <h3>Starter</h3>
-                <p>Prix : 8.5€/mois</p>
-                <p>Le stockage sécurisé des données médicales</p>
-                <p>Les rappels santé</p>
+                <h3>Personnel</h3>
+                <p>Prix : 6,99€/mois</p>
+                <p>Stockage sécurisé, rappels santé, suivi des habitudes.</p>
             </div>
-            <div class="pricing-plan">
-                <h3>Premium</h3>
-                <p>Prix : 15.5€/mois</p>
-                <p>Accès complet aux fonctionnalités</p>
-                <p>Coffre-fort électronique</p>
-                <p>Finance, assurance, mutuelle, banque</p>
-                <p>Intelligence artificielle pour gérer le budget</p>
-                <p>Support prioritaire</p>
-            </div>
+            <!-- Autres plans -->
         </div>
     </section>
     <section id="contact">
@@ -410,7 +357,6 @@
 </footer>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Amélioration pour éviter les alertes intempestives
         const contactForm = document.getElementById('contactForm');
         contactForm.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -419,4 +365,4 @@
     });
 </script>
 </body>
-
+</html>

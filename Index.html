@@ -163,10 +163,10 @@
             height: auto;
         }
         #hero {
-            background: url('pexels-shkrabaanthony-5215017.jpg') no-repeat center center/cover;
+            background: url('une jolie femme médecin (2).png') no-repeat center center/cover;
             color: #fff;
             text-align: center;
-            padding: 100px 20px;
+            padding: 60px 20px;
         }
         #hero .container {
             max-width: 800px;
@@ -252,7 +252,6 @@
                 font-size: 1em;
             }
         }
-
         button, .blue-button {
             padding: 10px 20px;
             border-radius: 5px;
@@ -308,11 +307,8 @@
 </header>
 <main>
     <section id="hero">
-        <div class="container">
-            <h2>Votre santé, simplifiée avec HealthSmart</h2>
-            <p>Gérez vos données médicales, suivez vos habitudes et plus encore.</p>
-            <a href="#features" class="blue-button">En savoir plus</a>
-        </div>
+        <h1>Prenez le contrôle de votre santé</h1>
+        <p>Avec HealthSmart, bénéficiez d’un suivi personnalisé, de rappels médicaux et d'une intégration parfaite avec vos appareils connectés.</p>
     </section>
     <section id="features">
         <h2>Fonctionnalités</h2>
@@ -326,12 +322,14 @@
             <div class="feature">
                 <span class="icon">🌿</span>
                 <h3><a href="Équilibre_Total.html">Équilibre Total</a></h3>
-                <p>Tableau de bord personnalisé, évaluation de l'humeur, et intégration connectée.</p>
+                <p>Tableau de bord personnalisé, </p>
+                <p> évaluation de l'humeur, et intégration connectée.</p>
             </div>
             <div class="feature">
                 <span class="icon">🗂️</span>
-                <h3><a href="medical_agenda3.html">Agenda médical</a></h3>
-                <p>Organisez et gérez vos rendez-vous, synchronisez-les avec votre calendrier.</p>
+                <h3><a href="medical_agenda.html">Agenda médical</a></h3>
+                <p>Organisez et gérez vos rendez-vous,</p>
+                <p>   synchronisez-les avec votre calendrier.</p>
             </div>
             <div class="feature">
                 <span class="icon">⚖️</span>
@@ -346,13 +344,14 @@
             <div class="feature">
                 <span class="icon">🚑</span>
                 <h3><a href="urgence.html">Urgence</a></h3>
-                <p>Informations d'urgence : groupe sanguin, allergènes, antécédents médicaux.</p>
+                <p>Informations d'urgence :<p>
+                <p>   groupe sanguin, allergènes, antécédents médicaux.<p>
             </div>
             <div class="feature">
                 <span class="icon">🔗</span>
                 <h3><a href="Santé_connectée.html">Santé connectée</a></h3>
-                <p>Intégrez vos montres connectées et autres appareils pour un suivi automatisé de vos données de santé.</p>
-                <p>Analysez vos signes vitaux et recevez des recommandations basées sur vos performances en temps réel.</p>
+                <p>Intégrez vos montres connectées </p>
+                <p>Analysez vos signes vitaux .</p>
             </div>
         </div>
     </section>
@@ -361,7 +360,7 @@
         <div class="pricing-grid">
             <div class="pricing-plan card">
                 <h3>Starter</h3>
-                <p>Prix : 8.5€/mois</p>
+                <p>Prix :8.5/mois</p>
                 <p>Stockage sécurisé des données médicales.</p>
                 <p>Rappels santé et suivi des habitudes.</p>
             </div>
@@ -397,6 +396,15 @@
         contactForm.addEventListener('submit', function(event) {
             event.preventDefault();
             alert('Votre message a été envoyé avec succès !');
+        });
+    });
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            this.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 500);
         });
     });
 </script>

@@ -70,21 +70,20 @@
             font-size: 12px;
             text-align: center;
         }
-        .category.spend { background-color: white; color: black; }
-        .category.edu { background-color: blue; }
         .category.health { background-color: lightgreen; }
+        .category.edu { background-color: blue; }
         .category.time { background-color: orange; }
+        .category.sub { background-color: skyblue; }
         .category.travel { background-color: turquoise; }
         .category.invest { background-color: #800000; color: white; }
         .category.eco { background-color: olive; }
         .category.skill { background-color: violet; }
         .category.family { background-color: pink; }
         .category.secure { background-color: grey; }
-        .category.event { background-color: yellow; }
+        .category.event { background-color: #FFDEAD; }
         .category.green { background-color: forestgreen; }
         .category.home { background-color: tan; }
-        .category.pension { background-color: navy; }
-        .category.sub { background-color: skyblue; }
+        .category.spend { background-color:#00308F; color: black; }
         .category.mind { background-color: lavender; }
         @media screen and (max-width: 768px) {
             .circle-container {
@@ -126,6 +125,38 @@
         }
         #modal button:hover {
             background: #333;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffffff, #ffffff); /* Dégradé vert clair */
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        header nav ul li {
+            display: inline;
+            position: relative;
+        }
+        header nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        header nav ul li:hover .dropdown-content {
+            display: block;
         }
     </style>
 </head>
@@ -182,15 +213,9 @@
             name: "InvestSmart",
             class: "invest",
             descriptionPart1: "Simulateur d'épargne, conseils financiers.",
-            descriptionPart2: "Prévisions personnalisées, IA de suivi d'investissements.",
+            descriptionPart2: "Prévisions personnalisées, IA de suivi d'investissements," +
+                "Simulateur retraite, suivi d'objectifs financiers..",
             pricing: "Starter : 12€ | Premium : 25€"
-        },
-        {
-            name: "EcoSmart",
-            class: "eco",
-            descriptionPart1: "Suivi de consommation énergétique, conseils écologiques.",
-            descriptionPart2: "Analyse d'économies d'énergie, gestion de contrats énergétiques.",
-            pricing: "Starter : 9€ | Premium : 20€"
         },
         {
             name: "SkillSmart",
@@ -221,9 +246,10 @@
             pricing: "Starter : 8€ | Premium : 18€"
         },
         {
-            name: "GreenSmart",
+            name: "planetSmart",
             class: "green",
-            descriptionPart1: "Calculs d'impact écologique, émissions carbone personnelles.",
+            descriptionPart1: "Calculs d'impact écologique, émissions carbone personnelles," +
+                " Suivi de consommation énergétique.",
             descriptionPart2: "Rapports détaillés, conseils verts, intégration reforestation.",
             pricing: "Starter : 9€ | Premium : 20€"
         },
@@ -233,13 +259,6 @@
             descriptionPart1: "Suivi des dépenses, gestion de projets de rénovation.",
             descriptionPart2: "Comparateur de devis, gestion des contrats d'artisans.",
             pricing: "Starter : 10€ | Premium : 25€"
-        },
-        {
-            name: "PensionSmart",
-            class: "pension",
-            descriptionPart1: "Simulateur retraite, suivi d'objectifs financiers.",
-            descriptionPart2: "Stratégies fiscales personnalisées, prévisions long terme.",
-            pricing: "Starter : 12€ | Premium : 22€"
         },
         {
             name: "SubSmart",
