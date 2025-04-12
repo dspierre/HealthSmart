@@ -23,7 +23,7 @@
    - Naviguez vers le dossier contenant l'application.  
    - Tapez la commande suivante :  
      ```
-     node app.js
+     node app4.js
      ```
 5. **Vérifiez le résultat**  
    Si tout fonctionne correctement, vous devriez voir le message suivant dans le terminal :  
