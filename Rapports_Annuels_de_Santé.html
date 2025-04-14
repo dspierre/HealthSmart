@@ -120,24 +120,28 @@
         let chart;
         // Fonction pour récupérer les données depuis l'API
         const fetchDataFromAPI = async () => {
-            loader.style.display = "block";
+            loader.style.display = "block"; // Affiche le loader
             try {
-                const response = await fetch('http://localhost:3000/api/stats');
+                const response = await fetch('http://localhost:3000/api/stats'); // URL API
                 if (!response.ok) {
                     throw new Error(`Erreur réseau : ${response.status}`);
                 }
-                const data = await response.json();
-                loader.style.display = "none";
-                return data;
+                const data = await response.json(); // Récupération des données
+                loader.style.display = "none"; // Masquer le loader après le chargement
+                return data; // Retourne les données
             } catch (error) {
                 console.error("Erreur lors de la récupération des données :", error);
-                alert("Impossible de charger les données.");
+                alert("Impossible de charger les données. Veuillez vérifier l'API.");
                 loader.style.display = "none";
-                return null;
+                return null; // Retourne null en cas d'erreur
             }
         };
         // Fonction pour mettre à jour les statistiques affichées
         const updateStatistics = (data) => {
+            if (!data) {
+                console.error("Données invalides reçues, annulation de la mise à jour.");
+                return;
+            }
             document.getElementById("total-rendez-vous").textContent = data.totalRendezVous || 0;
             document.getElementById("depenses").textContent = (data.depenses || 0) + " €";
             document.getElementById("progres-sante").textContent = (data.progresSante || 0) + " %";
@@ -148,62 +152,100 @@
         };
         // Fonction pour créer un graphique basé sur la catégorie sélectionnée
         const createChartByCategory = (category, data) => {
-            if (!data) return;
+            if (!data) {
+                console.error("Impossible de créer le graphique, données invalides.");
+                return;
+            }
             const categoriesMap = {
-                totalRendezVous: { label: "Total des Rendez-vous", data: data.totalRendezVous, color: "green" },
-                depenses: { label: "Dépenses Médicales (€)", data: data.depenses, color: "blue" },
-                progresSante: { label: "Progrès Santé (%)", data: data.progresSante, color: "orange" },
-                nombrePas: { label: "Nombre de Pas", data: data.nombrePas, color: "purple" },
-                sommeil: { label: "Sommeil (heures)", data: data.sommeil, color: "cyan" },
-                consommationLiquide: { label: "Consommation Liquide (litres)", data: data.consommationLiquide, color: "teal" },
-                frequenceCardiaque: { label: "Fréquence Cardiaque (bpm)", data: data.frequenceCardiaque, color: "red" }
+                totalRendezVous: {
+                    label: "Total des Rendez-vous",
+                    data: data.totalRendezVous,
+                    color: "green"
+                },
+                depenses: {
+                    label: "Dépenses Médicales (€)",
+                    data: data.depenses,
+                    color: "blue"
+                },
+                progresSante: {
+                    label: "Progrès Santé (%)",
+                    data: data.progresSante,
+                    color: "orange"
+                },
+                nombrePas: {
+                    label: "Nombre de Pas",
+                    data: data.nombrePas,
+                    color: "purple"
+                },
+                sommeil: {
+                    label: "Sommeil (heures)",
+                    data: data.sommeil,
+                    color: "cyan"
+                },
+                consommationLiquide: {
+                    label: "Consommation Liquide (litres)",
+                    data: data.consommationLiquide,
+                    color: "teal"
+                },
+                frequenceCardiaque: {
+                    label: "Fréquence Cardiaque (bpm)",
+                    data: data.frequenceCardiaque,
+                    color: "red"
+                }
             };
+            if (!categoriesMap[category]) {
+                console.error("Catégorie non valide :", category);
+                return;
+            }
             const { label, data: chartData, color } = categoriesMap[category];
-            if (chart) chart.destroy();
+            if (chart) {
+                chart.destroy(); // Détruire le graphique précédent
+            }
             chart = new Chart(ctx, {
-                type: "line",
+                type: "line", // Graphique en lignes
                 data: {
+                    labels: ["Semaine 1", "Semaine 2", "Semaine 3", "Semaine 4"], // Noms des périodes
                     datasets: [{
                         label: label,
                         data: chartData,
                         borderColor: color,
-                        backgroundColor: `${color}33`,
+                        backgroundColor: `${color}33`, // Couleur avec transparence
                         borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        tooltip: { enabled: true, callbacks: { label: (context) => `Valeur : ${context.raw}` } },
-                        legend: { display: true, position: "top" }
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function (context) {
+                                    return `Valeur : ${context.raw}`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: "top"
+                        }
                     }
                 }
             });
         };
-        // Fonction pour gérer le mode sombre
-        const toggleDarkMode = () => {
-            document.body.classList.toggle("dark-mode");
-        };
-        // Fonction pour télécharger le rapport en PDF
-        const downloadPDF = () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("Rapport Annuel de Santé", 10, 10);
-            doc.save("rapport_sante.pdf");
-        };
         // Initialisation de la page
         const init = async () => {
-            const data = await fetchDataFromAPI();
-            if (!data) return;
-            updateStatistics(data);
-            createChartByCategory(categoryFilter.value, data);
+            const data = await fetchDataFromAPI(); // Récupération des données depuis l'API
+            if (!data) return; // Si les données ne sont pas disponibles, annule
+            updateStatistics(data); // Met à jour les statistiques affichées
+            // Crée un graphique pour la catégorie sélectionnée
             categoryFilter.addEventListener("change", () => {
-                createChartByCategory(categoryFilter.value, data);
+                const selectedCategory = categoryFilter.value;
+                createChartByCategory(selectedCategory, data); // Crée un graphique pour la catégorie sélectionnée
             });
-            document.getElementById("toggle-dark-mode").addEventListener("click", toggleDarkMode);
-            document.getElementById("download-pdf").addEventListener("click", downloadPDF);
+            // Affiche initialement un graphique basé sur la première catégorie
+            createChartByCategory(categoryFilter.value, data);
         };
-        init();
+        init(); // Démarre l'application
     });
 </script>
 </body>
